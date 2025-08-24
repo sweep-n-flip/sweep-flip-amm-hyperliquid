@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+}
+
+:root {
+  --12px-cake-font-family: "Poppins", Helvetica;
+  --12px-cake-font-size: 12px;
+  --12px-cake-font-style: normal;
+  --12px-cake-font-weight: 600;
+  --12px-cake-letter-spacing: 0px;
+  --12px-cake-line-height: 110%;
+  --14px-cake-font-family: "Poppins", Helvetica;
+  --14px-cake-font-size: 14px;
+  --14px-cake-font-style: normal;
+  --14px-cake-font-weight: 600;
+  --14px-cake-letter-spacing: 0px;
+  --14px-cake-line-height: 110%;
+  --16px-cake-font-family: "Poppins", Helvetica;
+  --16px-cake-font-size: 16px;
+  --16px-cake-font-style: normal;
+  --16px-cake-font-weight: 600;
+  --16px-cake-letter-spacing: 0px;
+  --16px-cake-line-height: 110%;
+  --app-primary: rgba(255, 46, 0, 1);
+  --borderinput: rgba(217, 217, 217, 1);
+  --daybreak-blueblue-6: rgba(24, 144, 255, 1);
+  --default-font-family: "Poppins", Helvetica;
+  --default-font-size: 14px;
+  --default-font-style: normal;
+  --default-font-weight: 400;
+  --default-letter-spacing: 0px;
+  --default-line-height: 22px;
+  --drop-sweep: 2px 2px 8px 0px rgba(0, 0, 0, 0.25);
+  --graygray-1: rgba(255, 255, 255, 1);
+  --graygray-10: rgba(38, 38, 38, 1);
+  --graygray-2: rgba(250, 250, 250, 1);
+  --graygray-3: rgba(245, 245, 245, 1);
+  --graygray-4: rgba(240, 240, 240, 1);
+  --graygray-5: rgba(217, 217, 217, 1);
+  --graygray-6: rgba(191, 191, 191, 1);
+  --graygray-7: rgba(140, 140, 140, 1);
+  --graygray-8: rgba(89, 89, 89, 1);
+  --graygray-9: rgba(67, 67, 67, 1);
+  --graygray1-white: rgba(255, 255, 255, 1);
+  --graygray5-border: rgba(217, 217, 217, 1);
+  --graygray9-primary-text: rgba(67, 67, 67, 1);
+  --magenta-magenta-1: rgba(255, 240, 246, 1);
+  --magenta-magenta-3: rgba(255, 173, 210, 1);
+  --magenta-magenta-6: rgba(235, 47, 150, 1);
+  --mainwhite: rgba(255, 255, 255, 1);
+  --orangesweep-6: rgba(255, 46, 0, 1);
+  --primaryprimary-3: rgba(254, 169, 193, 1);
+  --primaryprimary-6: rgba(224, 98, 133, 1);
+  --regular-14px-22px-font-family: "SF Pro Text", Helvetica;
+  --regular-14px-22px-font-size: 14px;
+  --regular-14px-22px-font-style: normal;
+  --regular-14px-22px-font-weight: 400;
+  --regular-14px-22px-letter-spacing: 0px;
+  --regular-14px-22px-line-height: 22px;
+  --text: rgba(67, 67, 67, 1);
+  --text-base-regular-font-family: "Poppins", Helvetica;
+  --text-base-regular-font-size: 14px;
+  --text-base-regular-font-style: normal;
+  --text-base-regular-font-weight: 400;
+  --text-base-regular-letter-spacing: 0px;
+  --text-base-regular-line-height: 22px;
+  --text-base-semibold-font-family: "Poppins", Helvetica;
+  --text-base-semibold-font-size: 14px;
+  --text-base-semibold-font-style: normal;
+  --text-base-semibold-font-weight: 600;
+  --text-base-semibold-letter-spacing: 0px;
+  --text-base-semibold-line-height: 22px;
+  --text-small-regular-font-family: "Poppins", Helvetica;
+  --text-small-regular-font-size: 12px;
+  --text-small-regular-font-style: normal;
+  --text-small-regular-font-weight: 400;
+  --text-small-regular-letter-spacing: 0px;
+  --text-small-regular-line-height: 20px;
+  --text-text-12px-400-font-family: "Poppins", Helvetica;
+  --text-text-12px-400-font-size: 12px;
+  --text-text-12px-400-font-style: normal;
+  --text-text-12px-400-font-weight: 400;
+  --text-text-12px-400-letter-spacing: 0px;
+  --text-text-12px-400-line-height: 20px;
+  --text-text-14px-400-font-family: "Poppins", Helvetica;
+  --text-text-14px-400-font-size: 14px;
+  --text-text-14px-400-font-style: normal;
+  --text-text-14px-400-font-weight: 400;
+  --text-text-14px-400-letter-spacing: 0px;
+  --text-text-14px-400-line-height: 22px;
+  --text-text-14px-600-font-family: "Poppins", Helvetica;
+  --text-text-14px-600-font-size: 14px;
+  --text-text-14px-600-font-style: normal;
+  --text-text-14px-600-font-weight: 600;
+  --text-text-14px-600-letter-spacing: 0px;
+  --text-text-14px-600-line-height: 22px;
+  --textsubtle: rgba(140, 140, 140, 1);
+  --title-title-20px-600-font-family: "Poppins", Helvetica;
+  --title-title-20px-600-font-size: 20px;
+  --title-title-20px-600-font-style: normal;
+  --title-title-20px-600-font-weight: 600;
+  --title-title-20px-600-letter-spacing: 0px;
+  --title-title-20px-600-line-height: 28px;
+  --title-title-24px-600-font-family: "Poppins", Helvetica;
+  --title-title-24px-600-font-size: 24px;
+  --title-title-24px-600-font-style: normal;
+  --title-title-24px-600-font-weight: 600;
+  --title-title-24px-600-letter-spacing: 0px;
+  --title-title-24px-600-line-height: 32px;
+  --white: rgba(255, 255, 255, 1);
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --card: transparent;
+  --card-foreground: 222.2 47.4% 11.2%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 215 20.2% 65.1%;
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-inter);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --card: transparent;
+    --card-foreground: 213 31% 91%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 216 34% 17%;
+  }
+}
+
+@layer base {
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
