@@ -222,10 +222,52 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
+    /* Variáveis do projeto SNF/Berachain */
+    --font-poppins: "Poppins", sans-serif;
+    --font-syne: "Syne", sans-serif;
+    --color-1: 0 100% 63%;
+    --color-2: 270 100% 63%;
+    --color-3: 210 100% 63%;
+    --color-4: 195 100% 63%;
+    --color-5: 90 100% 63%;
   }
 }
 
+/* HERO IMAGE - Estilos específicos do SNF */
+.td-figure {
+  perspective: 1500px;
+}
 
+.td-figure-img {
+  transform: rotateX(10deg) rotateY(-25deg) rotateZ(3deg);
+  border-radius: 0.375em;
+  transition: 0.3s;
+}
+
+.td-figure-img:hover {
+  transform: rotate(0);
+}
+
+/* Botões personalizados */
+.solid-button {
+  @apply !bg-hyperGreen hover:!bg-hyperGreen/75 !text-gray-600 active:!text-white active:!bg-[#ca9025] !py-6 !text-lg !font-semibold;
+}
+
+.oragen-button {
+  @apply !bg-[#ff2e00] hover:!bg-[#ff2e00]/75 !text-white active:!bg-[#a1290e] !py-6 !text-lg !font-semibold;
+}
+
+.outlined-button {
+  @apply !text-hyperGreen hover:!text-hyperGreen/75 active:!text-[#ca9025] !border-hyperGreen hover:border-hyperGreen/75 active:!border-[#ca9025] !py-6 !text-lg !font-semibold;
+}
+
+/* Remove spinners from input type number */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 @layer base {
   * {
