@@ -10,6 +10,7 @@ import { useTokenPriceInUSD } from "@/hooks/pricing/useTokenPriceInUSD";
 import { useLiquidityFlow } from "@/hooks/useLiquidityFlow";
 import { useTokenBalance } from "@/hooks/wallet";
 import { useHyperliquidUserNfts } from "@/hooks/wallet/useHyperliquidUserNfts";
+import { useLpTokenBalance } from "@/hooks/wallet/useLpTokenBalance";
 import { usePoolNfts } from "@/hooks/wallet/usePoolNfts";
 import { usePrioritizedCollections } from "@/hooks/wallet/usePrioritizedCollections";
 import { useUserNfts } from "@/hooks/wallet/useUserNfts";
@@ -531,6 +532,22 @@ export const LiquidityContent = (): JSX.Element | null => {
       expectedETHAmount: BigInt(0),
       expectedLiquidity: BigInt(0),
     },
+  });
+
+  // Check user's LP Token balance for the selected collection
+  const userLpTokenBalance = useLpTokenBalance({
+    tokenB: selectedCollection ? {
+      address: (selectedCollection.collection?.id || selectedCollection.address) as Address, // Use wrapper address for getPair
+      symbol: selectedCollection.symbol,
+      decimals: 0, // NFT collections don't have decimals
+      isErc20: false,
+      isCollection: true,
+      collection: {
+        id: selectedCollection.collection?.id || selectedCollection.address,
+        address: (selectedCollection.collection?.address || selectedCollection.address) as string, // Original NFT contract address
+      },
+    } : null,
+    enabled: !!selectedCollection, // Only run when collection is selected
   });
 
   // Handle action/type changes
@@ -1303,7 +1320,9 @@ export const LiquidityContent = (): JSX.Element | null => {
             },
             { 
               label: "Your LP Tokens", 
-              value: (parseFloat(liquidityFlow.lpTokenBalance.balanceFormatted).toFixed(4)) || "0.0000"
+              value: userLpTokenBalance.balanceFormatted
+                ? Number(userLpTokenBalance.balanceFormatted).toFixed(4)
+                : "0.0000"
             },
           ]}
           primaryImageSrc={selectedCollection.logo || '/placeholder-nft.svg'}

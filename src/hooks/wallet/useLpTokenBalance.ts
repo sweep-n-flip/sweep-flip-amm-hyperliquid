@@ -38,7 +38,6 @@ interface LpTokenBalanceResult {
 }
 
 export function useLpTokenBalance({
-  tokenA,
   tokenB,
   enabled = true
 }: UseLpTokenBalanceParams): LpTokenBalanceResult {
@@ -146,7 +145,7 @@ export function useLpTokenBalance({
     totalSupply: totalSupply || BigInt(0),
     sharePercentage,
     pairAddress: (pairExists ? pairAddress : null) as Address | null,
-    wrapperAddress: null, // Not needed since getPair handles wrapper logic internally
+    wrapperAddress: null,
     pairExists: !!pairExists,
     isLoading,
     error,
