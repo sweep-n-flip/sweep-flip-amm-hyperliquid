@@ -622,7 +622,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     } : null,
     collection: selectedCollection ? {
       id: selectedCollection.collection?.id || selectedCollection.address, // Use unique collection ID, fallback to wrapper address
-      address: (selectedCollection.collection?.id || selectedCollection.address) as Address,
+      address: (selectedCollection.address) as Address,
       symbol: selectedCollection.symbol,
     } : null,
     tokenAmount: liquidityType === 'token-nft' ? tokenAmount : undefined,

@@ -634,7 +634,7 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
 
           //  Calculate minimum amounts with slippage protection
           const amountAMin = amountInWei * BigInt(10000 - slippageTolerance) / BigInt(10000);
-
+          
           executeLiquidity({
             address: routerAddress as Address,
             abi: routerAbi,
@@ -667,7 +667,6 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
           if (!liquidityQuote?.expectedLiquidity || liquidityQuote.expectedLiquidity === BigInt(0)) {
             amountETHMin = BigInt(1); // Use 1 wei instead of 0 for safety
           }
-
           executeLiquidity({
             address: routerAddress as Address,
             abi: routerAbi,
