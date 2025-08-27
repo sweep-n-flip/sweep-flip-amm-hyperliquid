@@ -297,15 +297,6 @@ export function TokenSelector({
               </>
             )}
           </div>
-
-          {/* Manage Tokens Button */}
-          <div className="w-full h-8 flex items-center justify-between">
-            <button className="flex items-center justify-start w-[137px] h-8 rounded-xl border-none bg-transparent">
-              <span className="text-sm font-semibold text-[#FF2E00]">
-                Manage Tokens
-              </span>
-            </button>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -129,19 +129,24 @@ export const LiquidityContent = (): JSX.Element | null => {
   }, [tokenAddress, erc20Tokens, selectedChainId]);
 
   const selectedCollection = useMemo(() => {
-    if (!collectionAddress) {
-      // In create mode, use prioritized collections (user collections first)
-      if (liquidityAction === 'create') {
-        return defaultSelectedCollection || (prioritizedCollections.length > 0 ? prioritizedCollections[0] : undefined) || (nftTokens.length > 0 ? nftTokens[0] : undefined);
-      }
-      return nftTokens.length > 0 ? nftTokens[0] : undefined; // Default to first NFT
+    // If we have a collectionAddress, try to find it first
+    if (collectionAddress) {
+      // Look for the selected collection in both sources
+      const fromDatabase = nftTokens.find(token => token.address === collectionAddress);
+      const fromReservoir = prioritizedCollections.find(token => token.address === collectionAddress);
+      
+      const found = fromDatabase || fromReservoir;
+      if (found) return found;
     }
     
-    // Look for the selected collection in both sources
-    const fromDatabase = nftTokens.find(token => token.address === collectionAddress);
-    const fromReservoir = prioritizedCollections.find(token => token.address === collectionAddress);
-    
-    return fromDatabase || fromReservoir || undefined;
+    // Always default to the first available collection when no collection is selected or found
+    if (liquidityAction === 'create') {
+      // In create mode, use prioritized collections (user collections first)
+      return defaultSelectedCollection || (prioritizedCollections.length > 0 ? prioritizedCollections[0] : undefined) || (nftTokens.length > 0 ? nftTokens[0] : undefined);
+    } else {
+      // For Add/Remove liquidity, always default to first NFT collection from database
+      return nftTokens.length > 0 ? nftTokens[0] : undefined;
+    }
   }, [collectionAddress, nftTokens, liquidityAction, defaultSelectedCollection, prioritizedCollections]);
 
   // Get contract addresses
@@ -219,6 +224,34 @@ export const LiquidityContent = (): JSX.Element | null => {
       setCollectionAddress(defaultSelectedCollection.address);
     }
   }, [liquidityAction, collectionAddress, defaultSelectedCollection, mounted]);
+
+  // AIDEV-NOTE: Auto-select first tokens when they are loaded for Add/Remove liquidity
+  useEffect(() => {
+    if (!mounted || tokensLoading) return;
+    
+    // Auto-select first token if none selected for Add/Remove actions
+    if ((liquidityAction === 'add' || liquidityAction === 'remove') && !tokenAddress && erc20Tokens.length > 0) {
+      // Default to ETH if available, otherwise first ERC20 token
+      const ethToken = erc20Tokens.find(token => token.symbol === 'ETH');
+      const defaultToken = ethToken || erc20Tokens[0];
+      setTokenAddress(defaultToken.address);
+    }
+    
+    // Auto-select first collection if none selected for Add/Remove actions
+    if ((liquidityAction === 'add' || liquidityAction === 'remove') && !collectionAddress && nftTokens.length > 0) {
+      setCollectionAddress(nftTokens[0].address);
+    }
+  }, [mounted, tokensLoading, liquidityAction, tokenAddress, collectionAddress, erc20Tokens, nftTokens]);
+
+  // AIDEV-NOTE: Sync collectionAddress when selectedCollection changes automatically
+  useEffect(() => {
+    if (!mounted || tokensLoading) return;
+    
+    // Sync collectionAddress when selectedCollection is auto-selected but collectionAddress is still null
+    if (selectedCollection && !collectionAddress && (liquidityAction === 'add' || liquidityAction === 'remove')) {
+      setCollectionAddress(selectedCollection.address);
+    }
+  }, [mounted, tokensLoading, selectedCollection, collectionAddress, liquidityAction]);
 
   // Function to load more Reservoir collections (pagination)
   const loadMoreReservoirCollections = useCallback(async () => {
@@ -510,7 +543,26 @@ export const LiquidityContent = (): JSX.Element | null => {
     setSelectedTokenIds([]);
     setSliderValue(1);
     
-    //  Initialize token IDs based on new action
+    // Auto-select first available tokens for better UX
+    if (action === 'add' || action === 'remove') {
+      // For Add/Remove liquidity, ensure we have default selections immediately
+      if (erc20Tokens.length > 0) {
+        // Default to ETH if available, otherwise first ERC20 token
+        const ethToken = erc20Tokens.find(token => token.symbol === 'ETH');
+        const defaultToken = ethToken || erc20Tokens[0];
+        setTokenAddress(defaultToken.address);
+      }
+      
+      if (nftTokens.length > 0) {
+        setCollectionAddress(nftTokens[0].address);
+      }
+    } else if (action === 'create') {
+      // For create, reset to allow auto-selection via useEffect
+      setTokenAddress(null);
+      setCollectionAddress(null);
+    }
+    
+    // Initialize token IDs based on new action
     if ((action === 'create' || action === 'add') && unifiedUserNfts.tokenIds.length > 0) {
       const tokenIds = unifiedUserNfts.tokenIds.slice(0, 1);
       setSelectedTokenIds(tokenIds);
