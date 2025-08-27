@@ -1240,7 +1240,7 @@ export const LiquidityContent = (): JSX.Element | null => {
             currency="LP"
             value={undefined} // No USD value for LP tokens
             balance={liquidityFlow.lpTokenBalance.balanceFormatted}
-            iconSrc="/lp-token-icon.svg"
+            iconSrc="/icon.png"
             selectedToken={undefined}
             onTokenSelect={() => {}} // LP token is fixed
             onAmountChange={handleLiquidityAmountChange}

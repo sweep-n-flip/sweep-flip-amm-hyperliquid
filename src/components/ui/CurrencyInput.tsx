@@ -104,7 +104,7 @@ export function CurrencyInput({
               variant="outline"
               className="h-10 px-3 py-0 flex items-center gap-2 bg-white rounded-3xl border border-solid border-[#d9d9d9] shadow-sm whitespace-nowrap"
             >
-              <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center">
+              <div className="w-6 h-6 rounded-full bg-[#FF2E00] flex items-center justify-center">
                 <Image
                   width={14} 
                   height={20}
