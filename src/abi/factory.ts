@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Factory ABI for pool validation
+//  Factory ABI for pool validation
 export const factoryAbi = [
   {
     inputs: [

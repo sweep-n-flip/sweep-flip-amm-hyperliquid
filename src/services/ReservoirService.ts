@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Service for interacting with Reservoir API to fetch NFT data
+//  Service for interacting with Reservoir API to fetch NFT data
 import { type Address } from 'viem';
 
 // Chain ID to Reservoir API URL mapping

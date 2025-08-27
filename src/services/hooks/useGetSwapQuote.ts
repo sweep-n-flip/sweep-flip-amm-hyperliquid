@@ -1,4 +1,4 @@
-// AIDEV-NOTE: React hook facade with proper wagmi integration and slippage
+//  React hook facade with proper wagmi integration and slippage
 import { useCallback, useEffect, useMemo } from 'react';
 import { type Address } from 'viem';
 import { useReadContract } from 'wagmi';
@@ -18,14 +18,14 @@ import {
   type SwapQuoteResult,
   SwapType
 } from '../domain/entities';
-// AIDEV-NOTE: React-specific contract client that works with wagmi
+//  React-specific contract client that works with wagmi
 export class ReactContractClient {
   constructor(
     private readonly routerAddress: Address,
     private readonly factoryAddress: Address
   ) {}
 
-  // AIDEV-NOTE: These methods return objects that can be used with wagmi hooks
+  //  These methods return objects that can be used with wagmi hooks
   getRouterReadParams(functionName: string, args?: unknown[]) {
     return {
       address: this.routerAddress,
@@ -57,10 +57,10 @@ export class ReactContractClient {
 export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {  
   const { selectedChainId, selectedChain } = useChainContext();
   
-  // AIDEV-NOTE: Get slippage tolerance for calculations
+  //  Get slippage tolerance for calculations
   const { slippageTolerance } = useTransactionSettingsContext();
   
-  // AIDEV-NOTE: Get contract addresses for current chain
+  //  Get contract addresses for current chain
   const contractAddresses = useMemo(() => {
     const addresses = getContractAddresses(Number(selectedChainId));
     return {
@@ -72,10 +72,10 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
 
   const { router: routerAddress, weth: wethAddress } = contractAddresses;
 
-  // AIDEV-NOTE: Get tokens data from API
+  //  Get tokens data from API
   const { tokens } = usePairs(Number(selectedChainId));
   
-  // AIDEV-NOTE: Convert native token addresses to wrapped addresses for quotes
+  //  Convert native token addresses to wrapped addresses for quotes
   const getWrappedTokenAddress = useCallback((tokenAddress: Address): Address => {
     // If it's the zero address (native token), use the wrapped version
     if (tokenAddress === '0x0000000000000000000000000000000000000000') {
@@ -85,7 +85,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     return tokenAddress;
   }, [wethAddress]);
   
-  // AIDEV-NOTE: Get actual addresses for quotes (convert native to wrapped)
+  //  Get actual addresses for quotes (convert native to wrapped)
   const fromTokenAddressForQuote = useMemo(() => {
     return getWrappedTokenAddress(params.fromToken);
   }, [params.fromToken, getWrappedTokenAddress]);
@@ -94,7 +94,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     return getWrappedTokenAddress(params.toToken);
   }, [params.toToken, getWrappedTokenAddress]);
   
-  // AIDEV-NOTE: Find token data based on addresses with safety checks
+  //  Find token data based on addresses with safety checks
   const fromTokenData = useMemo(() => {
     if (!tokens || !params.fromToken) return undefined;
     return tokens.find(token => 
@@ -109,14 +109,14 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     );
   }, [tokens, params.toToken]);
 
-  // AIDEV-NOTE: Get pool data from API
+  //  Get pool data from API
   const { pool, canSwap } = usePoolByTokens(
     fromTokenData,
     toTokenData,
     Number(selectedChainId)
   );
 
-  // AIDEV-NOTE: Determine swap type
+  //  Determine swap type
   const swapType = useMemo(() => {
     if (params.tokenIds && params.tokenIds.length > 0) {
       return params.isExactInput ? SwapType.NFT_TO_ERC20 : SwapType.ERC20_TO_NFT;
@@ -124,7 +124,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     return SwapType.ERC20_TO_ERC20;
   }, [params.tokenIds, params.isExactInput]);
 
-  // AIDEV-NOTE: Determine route based on API data
+  //  Determine route based on API data
   const route = useMemo(() => {
     // Early return if tokens are not loaded yet
     if (!tokens || tokens.length === 0) {
@@ -140,7 +140,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
       return null;
     }
 
-    // AIDEV-NOTE: For NFT swaps, use pool data from API with correct native token
+    //  For NFT swaps, use pool data from API with correct native token
     if (pool) {
       // Get the pool's ERC20 token address and convert it if it's native
       const poolErc20TokenRaw = pool.erc20Token?.address;
@@ -182,7 +182,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     }
   }, [swapType, canSwap, pool, params.fromToken, params.toToken, wethAddress, tokens, fromTokenAddressForQuote, toTokenAddressForQuote, getWrappedTokenAddress]);
 
-  // AIDEV-NOTE: Execute quote based on route type
+  //  Execute quote based on route type
   const { data: directQuote, refetch: refetchDirectQuote } = useReadContract({
     address: routerAddress as Address,
     abi: routerAbi,
@@ -196,7 +196,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
   });
 
 
-  // AIDEV-NOTE: Multi-hop quote - for NFT swaps through intermediate token
+  //  Multi-hop quote - for NFT swaps through intermediate token
   const { data: nftQuote, refetch: refetchNftQuote } = useReadContract({
     address: routerAddress as Address,
     abi: routerAbi,
@@ -209,7 +209,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     },
   });
 
-  // AIDEV-NOTE: Multi-hop quote - for ERC20 to ERC20 conversion
+  //  Multi-hop quote - for ERC20 to ERC20 conversion
   const { data: erc20Quote, refetch: refetchErc20Quote } = useReadContract({
     address: routerAddress as Address,
     abi: routerAbi,
@@ -222,7 +222,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     },
   });
 
-  // AIDEV-NOTE: Get token decimals for formatting - use wrapped addresses
+  //  Get token decimals for formatting - use wrapped addresses
   const { data: fromTokenDecimals } = useReadContract({
     address: fromTokenAddressForQuote,
     abi: erc20Abi,
@@ -241,7 +241,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     },
   });
 
-  // AIDEV-NOTE: Refetch quotes when slippage changes
+  //  Refetch quotes when slippage changes
   useEffect(() => {
     
     if (route?.type === RouteType.DIRECT && params.tokenIds?.length) {
@@ -254,7 +254,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
     }
   }, [slippageTolerance, route?.type, params.tokenIds?.length, refetchDirectQuote, refetchNftQuote, refetchErc20Quote, nftQuote]);
 
-  // AIDEV-NOTE: Process results and return formatted quote with slippage protection
+  //  Process results and return formatted quote with slippage protection
   return useMemo(() => {
     // Show loading state if tokens are not loaded yet
     if (!tokens || tokens.length === 0) {
@@ -296,14 +296,14 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
       };
     }
 
-    // AIDEV-NOTE: Handle direct quotes with slippage protection
+    //  Handle direct quotes with slippage protection
     if (route.type === RouteType.DIRECT && directQuote) {
       const decimals = swapType === SwapType.ERC20_TO_NFT ? fromTokenDecimals : toTokenDecimals;
       const amount = swapType === SwapType.ERC20_TO_NFT ? directQuote[0] : directQuote[1];
       const expectedAmount = decimals ? (Number(amount) / Math.pow(10, decimals)) : 0;
       
       if (swapType === SwapType.ERC20_TO_NFT) {
-        // AIDEV-NOTE: Buying NFTs - apply slippage directly to the result
+        //  Buying NFTs - apply slippage directly to the result
         const slippageMultiplier = 1 + (slippageTolerance / 10000); // slippageTolerance is in basis points (500 = 5%)
         const amountWithSlippage = expectedAmount * slippageMultiplier;
         
@@ -319,7 +319,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
           isMultiHop: false,
         };
       } else {
-        // AIDEV-NOTE: Selling NFTs - apply slippage to reduce the expected output
+        //  Selling NFTs - apply slippage to reduce the expected output
         const slippageMultiplier = 1 - (slippageTolerance / 10000); // Reduce by slippage
         const amountWithSlippage = expectedAmount * slippageMultiplier;
         
@@ -336,14 +336,14 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
       }
     }
 
-    // AIDEV-NOTE: Handle multi-hop quotes with slippage protection
+    //  Handle multi-hop quotes with slippage protection
     if (route.type === RouteType.MULTI_HOP && erc20Quote) {
       const decimals = swapType === SwapType.ERC20_TO_NFT ? fromTokenDecimals : toTokenDecimals;
       const amount = swapType === SwapType.ERC20_TO_NFT ? erc20Quote[0] : erc20Quote[1];
       const expectedAmount = decimals ? (Number(amount) / Math.pow(10, decimals)) : 0;
       
       if (swapType === SwapType.ERC20_TO_NFT) {
-        // AIDEV-NOTE: Multi-hop buy - apply slippage directly to the result
+        //  Multi-hop buy - apply slippage directly to the result
         const slippageMultiplier = 1 + (slippageTolerance / 10000); // slippageTolerance is in basis points
         const amountWithSlippage = expectedAmount * slippageMultiplier;
         
@@ -359,7 +359,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
           isMultiHop: true,
         };
       } else {
-        // AIDEV-NOTE: Multi-hop sell - apply slippage to reduce expected output
+        //  Multi-hop sell - apply slippage to reduce expected output
         const slippageMultiplier = 1 - (slippageTolerance / 10000); // Reduce by slippage
         const amountWithSlippage = expectedAmount * slippageMultiplier;
         
@@ -376,7 +376,7 @@ export function useGetSwapQuote(params: SwapParameters): SwapQuoteResult {
       }
     }
 
-    // AIDEV-NOTE: Loading state
+    //  Loading state
     return {
       inputAmount: '0',
       outputAmount: '0',

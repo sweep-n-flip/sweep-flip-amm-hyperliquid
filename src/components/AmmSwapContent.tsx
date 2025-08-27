@@ -11,6 +11,7 @@ import { useTokenBalance } from "@/hooks/wallet";
 import { useHyperliquidUserNfts } from "@/hooks/wallet/useHyperliquidUserNfts";
 import { usePoolNfts } from "@/hooks/wallet/usePoolNfts";
 import { useUserNfts } from "@/hooks/wallet/useUserNfts";
+import { enrichHyperliquidTokens } from "@/lib/enrichHyperliquidTokens";
 import { HyperliquidCollectionsService } from "@/services/HyperliquidCollections";
 import { useSwapQuote } from '@/services/RouterService';
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -37,7 +38,13 @@ export const AmmSwapContent = (): JSX.Element => {
   const [showNftModal, setShowNftModal] = useState(false);
 
   // Fetch tokens using hybrid approach (Uniswap + internal API)
-  const { tokens: allTokens, loading: tokensLoading } = usePairs(Number(selectedChainId));
+  const { tokens: rawTokens, loading: tokensLoading } = usePairs(Number(selectedChainId));
+
+  //  Enrich Hyperliquid tokens with collection logos
+  const allTokens = useMemo(() => 
+    enrichHyperliquidTokens(rawTokens, Number(selectedChainId)), 
+    [rawTokens, selectedChainId]
+  );
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -109,7 +116,7 @@ export const AmmSwapContent = (): JSX.Element => {
     [selectedChainId]
   );
 
-  // AIDEV-NOTE: Fetch user's NFTs when selling NFTs (NFT → ERC20) - use appropriate hook based on chain
+  //  Fetch user's NFTs when selling NFTs (NFT → ERC20) - use appropriate hook based on chain
   const userNfts = useUserNfts({
     collectionAddress: mounted && swapDirection === 'nft-to-erc20' && fromToken?.isCollection && !isHyperliquidChain
       ? (fromToken.address as `0x${string}`) 
@@ -126,7 +133,7 @@ export const AmmSwapContent = (): JSX.Element => {
     chainId: Number(selectedChainId),
   });
 
-  // AIDEV-NOTE: Fetch pool NFTs when buying NFTs (ERC20 → NFT)
+  //  Fetch pool NFTs when buying NFTs (ERC20 → NFT)
   const poolNfts = usePoolNfts({
     collectionAddress: mounted && swapDirection === 'erc20-to-nft' && toToken?.isCollection 
       ? (toToken.address as `0x${string}`) 
@@ -156,7 +163,7 @@ export const AmmSwapContent = (): JSX.Element => {
     }
   }, [isHyperliquidChain, hyperliquidUserNfts, userNfts]);
 
-  // AIDEV-NOTE: Memoize user NFT count using unified data
+  //  Memoize user NFT count using unified data
   const userNftCount = useMemo(() => unifiedUserNfts.tokenIds.length, [unifiedUserNfts.tokenIds]);
 
   // Determine swap type based on token types
@@ -195,7 +202,7 @@ export const AmmSwapContent = (): JSX.Element => {
       isCollection: toToken.isCollection,
       isErc20: toToken.isErc20,
     } : null,
-    // AIDEV-NOTE: Use quote amounts for accurate approval
+    //  Use quote amounts for accurate approval
     amount: swapDirection === 'erc20-to-nft' 
       ? (swapQuote.inputAmount || fromAmount)  // Use calculated input amount for ERC20→NFT
       : (swapQuote.outputAmount || toAmount),  // Use calculated output amount for NFT→ERC20
@@ -278,7 +285,7 @@ export const AmmSwapContent = (): JSX.Element => {
   const getUserBalance = (token: typeof fromToken) => {
     if (!token) return "0";
     
-    // AIDEV-NOTE: For NFT → ERC20 swaps, show actual NFT count from wallet using unified data
+    //  For NFT → ERC20 swaps, show actual NFT count from wallet using unified data
     if (swapDirection === 'nft-to-erc20' && token === fromToken && token.isCollection) {
       return unifiedUserNfts.tokenIds.length.toString();
     }
@@ -330,7 +337,7 @@ export const AmmSwapContent = (): JSX.Element => {
   const getMaxAmount = useCallback((token: typeof toToken) => {
     if (!token) return 100;
     
-    // AIDEV-NOTE: For NFT → ERC20 swaps, use user's actual NFT count
+    //  For NFT → ERC20 swaps, use user's actual NFT count
     if (swapDirection === 'nft-to-erc20' && token === fromToken && token?.isCollection) {
       return Math.max(1, userNftCount); // User can sell all their NFTs
     }
@@ -464,7 +471,7 @@ export const AmmSwapContent = (): JSX.Element => {
     // Update fromAmount or toAmount based on swap direction
     if (swapDirection === 'nft-to-erc20') {
       setFromAmount(finalValue.toString());
-      // AIDEV-NOTE: For NFT → ERC20, use user's real NFT token IDs using unified data
+      //  For NFT → ERC20, use user's real NFT token IDs using unified data
       const currentToken = fromToken;
       if (currentToken?.isCollection && unifiedUserNfts.tokenIds.length > 0) {
         const tokenIds = unifiedUserNfts.tokenIds.slice(0, finalValue);
@@ -518,7 +525,7 @@ export const AmmSwapContent = (): JSX.Element => {
   const generateNftItems = (token: typeof fromToken | typeof toToken) => {
     if (!token || !token.isCollection) return [];
     
-    // AIDEV-NOTE: For NFT→ERC20 swaps, use user's wallet NFTs; for ERC20→NFT, use pool NFTs
+    //  For NFT→ERC20 swaps, use user's wallet NFTs; for ERC20→NFT, use pool NFTs
     let tokenIds: string[] = [];
     let maxNfts = 0;
     
@@ -544,7 +551,7 @@ export const AmmSwapContent = (): JSX.Element => {
       const tokenId = tokenIds[i];
       if (!tokenId) break; // Stop if no more token IDs available
       
-      // AIDEV-NOTE: Get actual image and name from Reservoir data based on swap direction
+      //  Get actual image and name from Reservoir data based on swap direction
       let nftImage = '/placeholder-nft.svg'; // Default placeholder
       let nftName = `Token #${tokenId}`;
       
@@ -705,7 +712,7 @@ export const AmmSwapContent = (): JSX.Element => {
           onChooseNfts={handleOpenNftModal}
           chainId={Number(selectedChainId)}
         >
-          {/* AIDEV-NOTE: For NFT → ERC20, add slider to FROM input */}
+          {/*  For NFT → ERC20, add slider to FROM input */}
           {swapDirection === 'nft-to-erc20' && (
             <CustomSlider
               value={sliderValue}

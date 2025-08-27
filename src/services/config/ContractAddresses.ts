@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Centralized contract addresses per chain
+//  Centralized contract addresses per chain
 // Based on official deployment documentation from uniswap-v2-nft repo
 
 import { type Address } from 'viem';
@@ -148,7 +148,7 @@ export const CONTRACT_ADDRESSES: Record<number, ChainAddresses> = {
   },
 };
 
-// AIDEV-NOTE: Utility functions for contract addresses
+//  Utility functions for contract addresses
 export function getContractAddresses(chainId: number): ChainAddresses {
   return CONTRACT_ADDRESSES[chainId] || CONTRACT_ADDRESSES[1]; // Fallback to Ethereum
 }

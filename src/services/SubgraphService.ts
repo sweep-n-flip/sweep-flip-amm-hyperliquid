@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Service for interacting with The Graph subgraphs
+//  Service for interacting with The Graph subgraphs
 import { GraphQLClient } from 'graphql-request';
 import { COLLECTION_CURRENCIES_QUERY } from './graphql/queries/CollectionCurrenciesQuery';
 import { COLLECTION_NATIVE_PAIRS_QUERY } from './graphql/queries/CollectionNativePairsQuery';
@@ -9,7 +9,7 @@ import { PAIR_DAILY_VOLUME_QUERY } from './graphql/queries/PairDailyVolumeQuery'
 import { PAIR_MONTHLY_TOTAL_VOLUME_QUERY } from './graphql/queries/PairMonthlyVolumeQuery';
 import { PAIR_REALTIME_DATA_QUERY } from './graphql/queries/PairRealtimeDataQuery';
 
-// AIDEV-NOTE: Chain IDs that match the backend configuration
+//  Chain IDs that match the backend configuration
 export enum ChainId {
   ETHEREUM = 1,
   BSC = 56,
@@ -20,7 +20,7 @@ export enum ChainId {
   HYPERLIQUID = 999,
 }
 
-// AIDEV-NOTE: Subgraph URLs copied from backend-v3 configuration
+//  Subgraph URLs copied from backend-v3 configuration
 const SUBGRAPH_ENDPOINTS: Record<ChainId, string> = {
   [ChainId.ETHEREUM]: 'https://api.studio.thegraph.com/query/109189/snf-mainnet/version/latest',
   [ChainId.BASE]: 'https://api.studio.thegraph.com/query/109189/snf-basemain/version/latest',
@@ -31,7 +31,7 @@ const SUBGRAPH_ENDPOINTS: Record<ChainId, string> = {
   [ChainId.HYPERLIQUID]: 'https://api.goldsky.com/api/public/project_cmejhyc7rqen501wed6sxgbn3/subgraphs/snf-hyperevm/v1.0.13-uni/gn',
 };
 
-// AIDEV-NOTE: Types based on the actual subgraph schema
+//  Types based on the actual subgraph schema
 export interface Token {
   id: string;
   symbol: string;
@@ -96,49 +96,49 @@ export class SubgraphService {
     return client;
   }
 
-  // AIDEV-NOTE: Get ERC20/Native tokens paired with collections
+  //  Get ERC20/Native tokens paired with collections
   async getERC20CollectionPairs(chainId: ChainId, first: number = 100, skip: number = 0) {
     const client = this.getClient(chainId);
     const response: any = await client.request(ERC20_NATIVE_PAIRS_QUERY, { first, skip });
     return response.pairs as Pair[];
   }
 
-  // AIDEV-NOTE: Get Collection/ERC20 pairs
+  //  Get Collection/ERC20 pairs
   async getCollectionERC20Pairs(chainId: ChainId, first: number = 100, skip: number = 0) {
     const client = this.getClient(chainId);
     const response: any = await client.request(COLLECTION_NATIVE_PAIRS_QUERY, { first, skip });
     return response.pairs as Pair[];
   }
 
-  // AIDEV-NOTE: Get Native/Collection pairs
+  //  Get Native/Collection pairs
   async getNativeCollectionPairs(chainId: ChainId, first: number = 100, skip: number = 0) {
     const client = this.getClient(chainId);
     const response: any = await client.request(NATIVE_COLLECTION_PAIRS_QUERY, { first, skip });
     return response.pairs as Pair[];
   }
 
-  // AIDEV-NOTE: Get all collection currencies
+  //  Get all collection currencies
   async getCollectionCurrencies(chainId: ChainId, first: number = 100, skip: number = 0) {
     const client = this.getClient(chainId);
     const response: any = await client.request(COLLECTION_CURRENCIES_QUERY, { first, skip });
     return response.currencies as Token[];
   }
 
-  // AIDEV-NOTE: Get daily volume for a specific pair
+  //  Get daily volume for a specific pair
   async getPairDailyVolume(chainId: ChainId, pairId: string) {
     const client = this.getClient(chainId);
     const response: any = await client.request(PAIR_DAILY_VOLUME_QUERY, { pair: pairId });
     return response.pairDays as PairDay[];
   }
 
-  // AIDEV-NOTE: Get monthly volume for a specific pair
+  //  Get monthly volume for a specific pair
   async getPairMonthlyVolume(chainId: ChainId, pairId: string) {
     const client = this.getClient(chainId);
     const response: any = await client.request(PAIR_MONTHLY_TOTAL_VOLUME_QUERY, { pair: pairId });
     return response.pairMonths as PairMonth[];
   }
 
-  // AIDEV-NOTE: Get all pairs for a chain (combines all types)
+  //  Get all pairs for a chain (combines all types)
   async getAllPairs(chainId: ChainId, firstOrOptions: number | { first?: number; skip?: number } = 100, skip: number = 0) {
     let first = 100;
     let skipValue = 0;
@@ -157,7 +157,7 @@ export class SubgraphService {
       this.getNativeCollectionPairs(chainId, first, skipValue),
     ]);
 
-    // AIDEV-NOTE: Remove duplicates by ID to prevent React key conflicts
+    //  Remove duplicates by ID to prevent React key conflicts
     const allPairs = [...erc20Pairs, ...collectionPairs, ...nativePairs];
     const uniquePairs = allPairs.filter((pair, index, array) => 
       array.findIndex(p => p.id === pair.id) === index
@@ -174,12 +174,12 @@ export class SubgraphService {
     return response.pair || null;
   }
 
-  // AIDEV-NOTE: Check if subgraph is available for a chain
+  //  Check if subgraph is available for a chain
   static isChainSupported(chainId: number): boolean {
     return chainId in SUBGRAPH_ENDPOINTS;
   }
 
-  // AIDEV-NOTE: Get supported chain IDs
+  //  Get supported chain IDs
   static getSupportedChains(): ChainId[] {
     return Object.keys(SUBGRAPH_ENDPOINTS).map(Number) as ChainId[];
   }

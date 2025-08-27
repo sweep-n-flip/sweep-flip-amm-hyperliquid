@@ -8,6 +8,12 @@ const HYPERLIQUID_COLLECTIONS = [
     symbol: "MOCK",
     name: "Mockdrop"
   },
+    {
+    address: "0xE967D204922aac2b8D9e7838850Cb0b67BF63F0e",
+    logo: "https://bafybeialsxqvna5fqc43epcllw4l7ltt7yvzysuk2efdeczv3ekaqeughe.ipfs.w3s.link/GenesisHLOgs-icon.png",
+    symbol: "GHLOG",
+    name: "Genesis HL-OGs"
+  },
   {
     address: "0xA24dB49Ba893A5DbB50Ac67D41BDC0955d193cA7",
     logo: "https://static.drip.trade/collections/illiquid_pfp.png",

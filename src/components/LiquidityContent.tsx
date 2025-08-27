@@ -13,6 +13,7 @@ import { useHyperliquidUserNfts } from "@/hooks/wallet/useHyperliquidUserNfts";
 import { usePoolNfts } from "@/hooks/wallet/usePoolNfts";
 import { usePrioritizedCollections } from "@/hooks/wallet/usePrioritizedCollections";
 import { useUserNfts } from "@/hooks/wallet/useUserNfts";
+import { enrichHyperliquidTokens } from "@/lib/enrichHyperliquidTokens";
 import { getContractAddresses } from "@/services/config/ContractAddresses";
 import { HyperliquidCollectionsService } from "@/services/HyperliquidCollections";
 import { ReservoirService } from "@/services/ReservoirService";
@@ -59,7 +60,13 @@ export const LiquidityContent = (): JSX.Element | null => {
   const [loadingMoreReservoirCollections, setLoadingMoreReservoirCollections] = useState(false);
 
   // Fetch tokens using hybrid approach
-  const { tokens: allTokens, loading: tokensLoading } = usePairs(Number(selectedChainId));
+  const { tokens: rawTokens, loading: tokensLoading } = usePairs(Number(selectedChainId));
+
+  //  Enrich Hyperliquid tokens with collection logos
+  const allTokens = useMemo(() => 
+    enrichHyperliquidTokens(rawTokens, Number(selectedChainId)), 
+    [rawTokens, selectedChainId]
+  );
 
   // Filter tokens by type
   const erc20Tokens = useMemo(() => 
@@ -179,7 +186,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     functionName: 'getPair',
     args: selectedToken && selectedCollection ? [
       selectedToken.address as Address,
-      (selectedCollection.collection?.id || selectedCollection.address) as Address // AIDEV-NOTE: Use wrapper address for getPair
+      (selectedCollection.collection?.id || selectedCollection.address) as Address //  Use wrapper address for getPair
     ] : undefined,
     query: {
       enabled: !!(selectedToken && selectedCollection && liquidityAction === 'create'),
@@ -188,7 +195,7 @@ export const LiquidityContent = (): JSX.Element | null => {
 
   // Check if NFT collection is approved for router
   const { data: isNftApprovedForRouter, refetch: refetchNftApproval } = useReadContract({
-    address: selectedCollection ? ((selectedCollection.collection?.id || selectedCollection.address) as Address) : undefined, // AIDEV-NOTE: Use wrapper address for approval check
+    address: selectedCollection ? ((selectedCollection.collection?.id || selectedCollection.address) as Address) : undefined, //  Use wrapper address for approval check
     abi: erc721Abi,
     functionName: 'isApprovedForAll',
     args: userAddress && selectedCollection ? [
@@ -220,7 +227,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     }
     setLoadingMoreReservoirCollections(true);
     try {
-      // AIDEV-NOTE: Get next page of collections from Reservoir
+      //  Get next page of collections from Reservoir
       const response = await ReservoirService.getAllCollections(
         Number(selectedChainId),
         20,
@@ -300,7 +307,7 @@ export const LiquidityContent = (): JSX.Element | null => {
       const loadReservoirCollections = async () => {
         setLoadingReservoirCollections(true);
         try {
-          // AIDEV-NOTE: Get all NFT collections from the chain via Reservoir
+          //  Get all NFT collections from the chain via Reservoir
           const response = await ReservoirService.getAllCollections(
             Number(selectedChainId),
             20 // API maximum limit is 20
@@ -397,7 +404,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     }
   }, [createPoolError]);
 
-  // AIDEV-NOTE: Additional hydration safety check
+  //  Additional hydration safety check
   if (typeof window === 'undefined') {
     return null; // Don't render on server
   }
@@ -503,7 +510,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     setSelectedTokenIds([]);
     setSliderValue(1);
     
-    // AIDEV-NOTE: Initialize token IDs based on new action
+    //  Initialize token IDs based on new action
     if ((action === 'create' || action === 'add') && unifiedUserNfts.tokenIds.length > 0) {
       const tokenIds = unifiedUserNfts.tokenIds.slice(0, 1);
       setSelectedTokenIds(tokenIds);
@@ -701,18 +708,18 @@ export const LiquidityContent = (): JSX.Element | null => {
     };
   };
 
-  // AIDEV-NOTE: NFT Approval Functions
+  //  NFT Approval Functions
   const handleApproveNft = async () => {
     if (!userAddress || !selectedCollection || !contractAddresses.router) {
       toast.error('Missing required parameters to approve NFT collection');
       return;
     }
 
-    const wrapperAddress = selectedCollection.collection?.id || selectedCollection.address; // AIDEV-NOTE: Use wrapper address for approval
+    const wrapperAddress = selectedCollection.collection?.id || selectedCollection.address; //  Use wrapper address for approval
 
     try {
       approveNft({
-        address: wrapperAddress as Address, // AIDEV-NOTE: Approve wrapper contract, not original NFT contract
+        address: wrapperAddress as Address, //  Approve wrapper contract, not original NFT contract
         abi: erc721Abi,
         functionName: 'setApprovalForAll',
         args: [
@@ -727,14 +734,14 @@ export const LiquidityContent = (): JSX.Element | null => {
     }
   };
 
-  // AIDEV-NOTE: Create Pool Functions
+  //  Create Pool Functions
   const handleCreatePool = async () => {
     if (!userAddress || !selectedToken || !selectedCollection || !selectedTokenIds.length) {
       toast.error('Missing required parameters to create pool');
       return;
     }
 
-    const wrapperAddress = selectedCollection.collection?.id || selectedCollection.address; // AIDEV-NOTE: Use wrapper address for pool operations
+    const wrapperAddress = selectedCollection.collection?.id || selectedCollection.address; //  Use wrapper address for pool operations
 
     try {
       // Check if pool already exists
@@ -755,7 +762,7 @@ export const LiquidityContent = (): JSX.Element | null => {
           abi: routerAbi,
           functionName: 'addLiquidityETHCollection',
           args: [
-            wrapperAddress as Address, // AIDEV-NOTE: Use wrapper address for pool creation
+            wrapperAddress as Address, //  Use wrapper address for pool creation
             tokenIdsAsBigInt, // tokenIds
             ethMinAmount, // amountETHMin
             userAddress, // to
@@ -774,7 +781,7 @@ export const LiquidityContent = (): JSX.Element | null => {
           functionName: 'addLiquidityCollection',
           args: [
             selectedToken.address as Address, // tokenA
-            wrapperAddress as Address, // AIDEV-NOTE: Use wrapper address for pool creation
+            wrapperAddress as Address, //  Use wrapper address for pool creation
             tokenAmountWei, // amountADesired
             tokenIdsAsBigInt, // tokenIdsB
             tokenMinAmount, // amountAMin
@@ -872,7 +879,7 @@ export const LiquidityContent = (): JSX.Element | null => {
   const generateNftItems = (token: typeof selectedCollection) => {
     if (!token || !token.isCollection) return [];
     
-    // AIDEV-NOTE: For create and add liquidity, use user's NFTs; for remove liquidity, use pool NFTs
+    //  For create and add liquidity, use user's NFTs; for remove liquidity, use pool NFTs
     let tokenIds: string[] = [];
     let maxNfts = 0;
     
@@ -898,7 +905,7 @@ export const LiquidityContent = (): JSX.Element | null => {
       const tokenId = tokenIds[i];
       if (!tokenId) break; // Stop if no more token IDs available
       
-      // AIDEV-NOTE: Get actual image and name from Reservoir data based on liquidity action
+      //  Get actual image and name from Reservoir data based on liquidity action
       let nftImage = '/placeholder-nft.svg'; // Default placeholder
       let nftName = `Token #${tokenId}`;
       
@@ -936,7 +943,7 @@ export const LiquidityContent = (): JSX.Element | null => {
 
   // Handle NFT modal
   const handleOpenNftModal = () => {
-    // AIDEV-NOTE: Only open modal when fully hydrated
+    //  Only open modal when fully hydrated
     if (mounted && typeof window !== 'undefined') {
       const availableNfts = generateNftItems(selectedCollection);
       setShowNftModal(true);
@@ -948,7 +955,7 @@ export const LiquidityContent = (): JSX.Element | null => {
   };
 
   const handleConfirmNftSelection = (selectedIds: string[]) => {
-    // AIDEV-NOTE: Prevent loop by ensuring mounted state
+    //  Prevent loop by ensuring mounted state
     if (mounted && typeof window !== 'undefined') {
       setSelectedTokenIds(selectedIds);
       setSliderValue(Math.max(1, selectedIds.length));

@@ -1,4 +1,4 @@
-// AIDEV-NOTE: ERC20 ABI for token information
+//  ERC20 ABI for token information
 export const erc20Abi = [
   {
     inputs: [],

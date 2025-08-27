@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Domain entities - pure business logic
+//  Domain entities - pure business logic
 import { type Address } from 'viem';
 
 export interface SwapQuote {
@@ -60,7 +60,7 @@ export interface SwapQuoteResult {
   outputAmount: string;
   priceImpact: string;
   minimumReceived: string;
-  maximumSent?: string; // AIDEV-NOTE: For slippage protection on buying
+  maximumSent?: string; //  For slippage protection on buying
   route: Address[];
   loading: boolean;
   error: Error | null;

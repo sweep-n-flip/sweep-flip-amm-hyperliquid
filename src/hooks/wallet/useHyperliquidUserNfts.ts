@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook to fetch NFTs owned by user for Hyperliquid collections using native contract calls
+//  Hook to fetch NFTs owned by user for Hyperliquid collections using native contract calls
 import { HyperliquidCollectionsService } from '@/services/HyperliquidCollections';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { type Address } from 'viem';

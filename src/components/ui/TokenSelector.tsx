@@ -3,6 +3,7 @@
 import { useChainContext } from '@/contexts/ChainContext'
 import { usePairs } from '@/hooks/api/usePairs'
 import { type TokenData } from '@/hooks/api/useTokensFromDatabase'
+import { enrichHyperliquidTokens } from '@/lib/enrichHyperliquidTokens'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
@@ -80,7 +81,13 @@ export function TokenSelector({
   const { selectedChainId } = useChainContext()
 
   // Fetch tokens using hybrid approach
-  const { tokens: allTokens, loading, error } = usePairs(Number(selectedChainId))
+  const { tokens: rawTokens, loading, error } = usePairs(Number(selectedChainId))
+
+  //  Enrich Hyperliquid tokens with collection logos
+  const allTokens = useMemo(() => 
+    enrichHyperliquidTokens(rawTokens, Number(selectedChainId)), 
+    [rawTokens, selectedChainId]
+  )
 
   // Filter tokens based on search and selected tab
   const filteredTokens = useMemo(() => {

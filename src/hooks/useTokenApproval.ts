@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook for managing ERC20 token approvals for router contract
+//  Hook for managing ERC20 token approvals for router contract
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { type Address, erc20Abi, maxUint256 } from 'viem';

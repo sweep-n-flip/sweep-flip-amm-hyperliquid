@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Configuration as a service
+//  Configuration as a service
 import { getSupportedChains } from './ContractAddresses';
 
 export interface RouterConfig {

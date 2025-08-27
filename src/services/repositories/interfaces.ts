@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Abstract repository interfaces
+//  Abstract repository interfaces
 import { type Address } from 'viem';
 import { type PoolReserves, type TokenInfo } from '../domain/entities';
 

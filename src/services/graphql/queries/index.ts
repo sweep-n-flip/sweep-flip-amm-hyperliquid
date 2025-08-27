@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Centralized exports for all GraphQL queries
+//  Centralized exports for all GraphQL queries
 export { COLLECTION_CURRENCIES_QUERY } from './CollectionCurrenciesQuery';
 export { COLLECTION_NATIVE_PAIRS_QUERY } from './CollectionNativePairsQuery';
 export { ERC20_NATIVE_PAIRS_QUERY } from './Erc20NativePairsQuery';
@@ -7,7 +7,7 @@ export { PAIR_DAILY_VOLUME_QUERY } from './PairDailyVolumeQuery';
 export { PAIR_MONTHLY_TOTAL_VOLUME_QUERY } from './PairMonthlyVolumeQuery';
 export { PAIR_REALTIME_DATA_QUERY } from './PairRealtimeDataQuery';
 
-// AIDEV-NOTE: TypeScript interfaces for query responses
+//  TypeScript interfaces for query responses
 export interface SubgraphToken {
   id: string;
   name: string;

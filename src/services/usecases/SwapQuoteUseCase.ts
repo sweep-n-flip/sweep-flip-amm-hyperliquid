@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Use cases - application business rules
+//  Use cases - application business rules
 import { formatUnits } from 'viem';
 import {
   RouteType,
@@ -29,16 +29,16 @@ export class SwapQuoteUseCase {
   ) {}
 
   async execute(params: SwapParameters): Promise<SwapQuote> {
-    // AIDEV-NOTE: Business rule validation
+    //  Business rule validation
     this.validateParameters(params);
 
-    // AIDEV-NOTE: Determine swap type
+    //  Determine swap type
     const swapType = this.determineSwapType(params);
 
-    // AIDEV-NOTE: Get optimal route
+    //  Get optimal route
     const route = await this.getOptimalRoute(params, swapType);
 
-    // AIDEV-NOTE: Calculate quote based on route
+    //  Calculate quote based on route
     return await this.calculateQuote(params, route, swapType);
   }
 
@@ -64,19 +64,19 @@ export class SwapQuoteUseCase {
   }
 
   private async getOptimalRoute(params: SwapParameters, swapType: SwapType): Promise<SwapRoute> {
-    // AIDEV-NOTE: Try direct route first
+    //  Try direct route first
     const directRoute = await this.tryDirectRoute(params, swapType);
     if (directRoute.isViable) {
       return directRoute;
     }
 
-    // AIDEV-NOTE: Fallback to multi-hop
+    //  Fallback to multi-hop
     return await this.getMultiHopRoute(params, swapType);
   }
 
   private async tryDirectRoute(params: SwapParameters, swapType: SwapType): Promise<SwapRoute> {
     try {
-      // AIDEV-NOTE: For NFT swaps, check if direct pool exists
+      //  For NFT swaps, check if direct pool exists
       if (swapType === SwapType.ERC20_TO_NFT || swapType === SwapType.NFT_TO_ERC20) {
         const poolExists = await this.poolRepository.checkPoolExists(params.fromToken, params.toToken);
         
@@ -110,12 +110,12 @@ export class SwapQuoteUseCase {
   }
 
   private async getMultiHopRoute(params: SwapParameters, swapType: SwapType): Promise<SwapRoute> {
-    // AIDEV-NOTE: For NFT swaps, use WETH as intermediary
+    //  For NFT swaps, use WETH as intermediary
     if (swapType === SwapType.ERC20_TO_NFT || swapType === SwapType.NFT_TO_ERC20) {
       const wethAddress = await this.tokenRepository.getWETHAddress(this.chainId);
       
       try {
-        // AIDEV-NOTE: Check if multi-hop route is viable
+        //  Check if multi-hop route is viable
         const pool1Exists = await this.poolRepository.checkPoolExists(params.fromToken, wethAddress);
         const pool2Exists = await this.poolRepository.checkPoolExists(wethAddress, params.toToken);
         
@@ -129,7 +129,7 @@ export class SwapQuoteUseCase {
           };
         }
       } catch {
-        // AIDEV-NOTE: Fall through to error
+        //  Fall through to error
       }
     }
 
@@ -160,7 +160,7 @@ export class SwapQuoteUseCase {
     const tokenIds = params.tokenIds || [];
     
     if (route.type === RouteType.DIRECT) {
-      // AIDEV-NOTE: Direct ERC20 → NFT quote
+      //  Direct ERC20 → NFT quote
       const amounts = await this.routerRepository.getAmountsInCollection(
         [...tokenIds],
         route.path,
@@ -180,7 +180,7 @@ export class SwapQuoteUseCase {
         isMultiHop: false,
       };
     } else {
-      // AIDEV-NOTE: Multi-hop ERC20 → WETH → NFT quote
+      //  Multi-hop ERC20 → WETH → NFT quote
       const wethAddress = route.path[1]; // WETH is the intermediary
       
       // Step 1: Get WETH needed for NFTs
@@ -215,7 +215,7 @@ export class SwapQuoteUseCase {
     const tokenIds = params.tokenIds || [];
     
     if (route.type === RouteType.DIRECT) {
-      // AIDEV-NOTE: Direct NFT → ERC20 quote
+      //  Direct NFT → ERC20 quote
       const amounts = await this.routerRepository.getAmountsOutCollection(
         [...tokenIds],
         route.path,
@@ -235,7 +235,7 @@ export class SwapQuoteUseCase {
         isMultiHop: false,
       };
     } else {
-      // AIDEV-NOTE: Multi-hop NFT → WETH → ERC20 quote
+      //  Multi-hop NFT → WETH → ERC20 quote
       const wethAddress = route.path[1]; // WETH is the intermediary
       
       // Step 1: Get WETH from NFTs
@@ -267,7 +267,7 @@ export class SwapQuoteUseCase {
   }
 
   private async calculateERC20ToERC20Quote(): Promise<SwapQuote> {
-    // AIDEV-NOTE: ERC20 to ERC20 swap - not yet implemented
+    //  ERC20 to ERC20 swap - not yet implemented
     throw new UnsupportedSwapTypeError('ERC20 to ERC20 swap not implemented yet');
   }
 }

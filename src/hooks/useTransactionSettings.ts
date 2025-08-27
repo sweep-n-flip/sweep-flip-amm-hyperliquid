@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Centralized transaction settings hook similar to AMM legacy
+//  Centralized transaction settings hook similar to AMM legacy
 import { useEffect, useState } from 'react'
 
 export interface TransactionSettings {
@@ -11,7 +11,7 @@ export const useTransactionSettings = () => {
   const [transactionDeadline, setTransactionDeadline] = useState(1200) // Default 20 minutes
   const [isHydrated, setIsHydrated] = useState(false)
 
-  // AIDEV-NOTE: Initialize values from localStorage after hydration
+  //  Initialize values from localStorage after hydration
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedSlippage = localStorage.getItem('slippageTolerance')
@@ -23,7 +23,7 @@ export const useTransactionSettings = () => {
       setIsHydrated(true)
     }
   }, [])
-  // AIDEV-NOTE: Persist to localStorage when values change (only after hydration)
+  //  Persist to localStorage when values change (only after hydration)
   useEffect(() => {
     if (isHydrated && typeof window !== 'undefined') {
       localStorage.setItem('slippageTolerance', slippageTolerance.toString())
@@ -36,12 +36,12 @@ export const useTransactionSettings = () => {
     }
   }, [transactionDeadline, isHydrated])
 
-  // AIDEV-NOTE: Helper functions for common calculations
+  //  Helper functions for common calculations
   const getSlippageDecimal = () => slippageTolerance / 10000 // Convert basis points to decimal
   const getSlippagePercentage = () => slippageTolerance / 100 // Convert basis points to percentage
   const getDeadlineInMinutes = () => transactionDeadline / 60 // Convert seconds to minutes
   
-  // AIDEV-NOTE: Calculate amounts with slippage protection
+  //  Calculate amounts with slippage protection
   const calculateMaxAmountIn = (expectedAmount: string | number) => {
     const amount = typeof expectedAmount === 'string' ? parseFloat(expectedAmount) : expectedAmount
     return amount * (1 + getSlippageDecimal())
@@ -52,12 +52,12 @@ export const useTransactionSettings = () => {
     return amount * (1 - getSlippageDecimal())
   }
 
-  // AIDEV-NOTE: Get transaction deadline for contract calls
+  //  Get transaction deadline for contract calls
   const getTransactionDeadline = () => {
     return Math.floor(Date.now() / 1000) + transactionDeadline
   }
 
-  // AIDEV-NOTE: Wrapper function to add logging
+  //  Wrapper function to add logging
   const loggedSetSlippageTolerance = (value: number) => {
     console.log('[setSlippageTolerance] Setting new value:', value);
     setSlippageTolerance(value);

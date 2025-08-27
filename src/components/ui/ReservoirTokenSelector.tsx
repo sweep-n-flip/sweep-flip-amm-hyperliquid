@@ -136,7 +136,7 @@ export function ReservoirTokenSelector({
     setIsMounted(true)
   }, [])
 
-  // AIDEV-NOTE: Auto-select removed to prevent infinite loops
+  //  Auto-select removed to prevent infinite loops
   // Auto-selection will be handled by parent component instead
 
   // Handle search with debouncing

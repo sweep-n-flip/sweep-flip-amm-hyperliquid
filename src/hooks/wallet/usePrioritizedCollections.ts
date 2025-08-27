@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook to get prioritized NFT collections for user (owned collections first)
+//  Hook to get prioritized NFT collections for user (owned collections first)
 import { useChainContext } from '@/contexts/ChainContext';
 import { type TokenData } from '@/hooks/api/useTokensFromDatabase';
 import { HyperliquidCollectionsService } from '@/services/HyperliquidCollections';

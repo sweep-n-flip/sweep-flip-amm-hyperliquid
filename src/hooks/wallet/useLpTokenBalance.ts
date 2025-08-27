@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook for querying LP token balance from Uniswap V2 pairs
+//  Hook for querying LP token balance from Uniswap V2 pairs
 import { useMemo } from 'react';
 import { type Address, erc20Abi, formatUnits } from 'viem';
 import { useAccount, useReadContract } from 'wagmi';
@@ -45,7 +45,7 @@ export function useLpTokenBalance({
   const { address: userAddress } = useAccount();
   const { selectedChainId, selectedChain } = useChainContext();
 
-  // AIDEV-NOTE: This hook finds LP token balance for WRAPPED_TOKEN/NFT_COLLECTION pairs
+  //  This hook finds LP token balance for WRAPPED_TOKEN/NFT_COLLECTION pairs
   // tokenA (ETH) is ignored - we always use wrapped token of current chain
   // tokenB should be the NFT collection with:
   //   - address: wrapper contract address (for getPair)
@@ -69,7 +69,7 @@ export function useLpTokenBalance({
 
   // Determine actual token addresses for the LP pair
   const actualTokenA = useMemo(() => {
-    // AIDEV-NOTE: For LP tokens, always use wrapped token of current chain as tokenA
+    //  For LP tokens, always use wrapped token of current chain as tokenA
     // This is the token that pairs with NFT collections in LP pools
     return wrappedTokenAddress;
   }, [wrappedTokenAddress]);

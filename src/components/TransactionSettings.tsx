@@ -27,7 +27,7 @@ const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." charact
 const THREE_DAYS_IN_SECONDS = 60 * 60 * 24 * 3
 
 export const TransactionSettings = ({ trigger }: TransactionSettingsProps) => {
-  // AIDEV-NOTE: Use centralized transaction settings context
+  //  Use centralized transaction settings context
   const { 
     slippageTolerance, 
     setSlippageTolerance,

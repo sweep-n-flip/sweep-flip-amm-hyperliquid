@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook for managing the complete swap flow (approval + swap)
+//  Hook for managing the complete swap flow (approval + swap)
 import { useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { type Address, parseUnits } from 'viem';
@@ -344,7 +344,7 @@ export const useSwapFlow = ({ fromToken, toToken, amount, tokenIds, swapType, sw
         // ERC20 → NFT: swapTokensForExactTokensCollection
         const path = [fromToken.address, toToken.address];
         
-        // AIDEV-NOTE: Use dynamic slippage from user settings
+        //  Use dynamic slippage from user settings
         let amountInMax: bigint;
         
         if (amountInWei > BigInt(0)) {
@@ -376,7 +376,7 @@ export const useSwapFlow = ({ fromToken, toToken, amount, tokenIds, swapType, sw
         // NFT → ERC20: swapExactTokensForTokensCollection
         const path = [fromToken.address, toToken.address];
         
-        // AIDEV-NOTE: Use dynamic slippage for minimum amount out
+        //  Use dynamic slippage for minimum amount out
         // For selling NFTs, we calculate minimum amount we're willing to accept
         let amountOutMin = BigInt(0);
         
@@ -425,7 +425,7 @@ export const useSwapFlow = ({ fromToken, toToken, amount, tokenIds, swapType, sw
         
         const path = [wethAddress, toToken.address]; // [WETH, NFT_COLLECTION]
         
-        // AIDEV-NOTE: For ETH->NFT swaps, we send the ETH value and don't need amountInMax
+        //  For ETH->NFT swaps, we send the ETH value and don't need amountInMax
         // The contract will use the sent ETH value as the maximum input
         executeSwap({
           address: routerAddress as Address,
@@ -446,7 +446,7 @@ export const useSwapFlow = ({ fromToken, toToken, amount, tokenIds, swapType, sw
         const wethAddress = addresses.weth;
         const path = [fromToken.address, wethAddress]; // [NFT_COLLECTION, WETH]
 
-        // AIDEV-NOTE: Use dynamic slippage for minimum ETH amount out
+        //  Use dynamic slippage for minimum ETH amount out
         let amountOutMin = BigInt(0);
         
         if (swapQuote?.amountOut) {

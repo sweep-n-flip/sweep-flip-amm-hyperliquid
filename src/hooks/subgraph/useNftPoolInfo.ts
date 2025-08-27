@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook para dados de NFT em tempo real via subgraph
+//  Hook para dados de NFT em tempo real via subgraph
 import { useChainContext } from '@/contexts/ChainContext';
 import { subgraphService, SubgraphService } from '@/services/SubgraphService';
 import { useQuery } from '@tanstack/react-query';
@@ -46,7 +46,7 @@ export const useNftPoolInfo = ({ poolId, enabled = true }: UseNftPoolInfoProps) 
         }
 
 
-        // AIDEV-NOTE: Calculate NFT metrics from pair data
+        //  Calculate NFT metrics from pair data
         const { reserve0, reserve1, discrete0, totalSupply, token0, token1 } = pairData;
 
         // Identify which token is NFT (discrete) and which is ERC20

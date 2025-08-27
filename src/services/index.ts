@@ -7,7 +7,7 @@ export * from './repositories/implementations';
 export * from './repositories/interfaces';
 export * from './usecases/SwapQuoteUseCase';
 
-// AIDEV-NOTE: Main service exports
+//  Main service exports
 export { useERC20ToNFTQuote, useSwapQuote } from './RouterService';
 export type { SwapQuoteParams } from './RouterService';
 

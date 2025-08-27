@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook for managing the complete NFT liquidity flow (approval + add/remove liquidity)
+//  Hook for managing the complete NFT liquidity flow (approval + add/remove liquidity)
 import { useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { type Address, parseUnits } from 'viem';
@@ -7,8 +7,8 @@ import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagm
 import { routerAbi } from '@/abi/router';
 import { useChainContext } from '@/contexts/ChainContext';
 import { useTransactionSettingsContext } from '@/contexts/TransactionSettingsContext';
-import { usePoolByTokens } from '@/hooks/api/usePoolByTokens';
 import { usePoolByCollection } from '@/hooks/api/usePoolByCollection';
+import { usePoolByTokens } from '@/hooks/api/usePoolByTokens';
 import { type TokenData } from '@/hooks/api/useTokensFromDatabase';
 import { getContractAddresses } from '@/services/config/ContractAddresses';
 import { useTokenApproval } from './useTokenApproval';
@@ -67,7 +67,7 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
   const contractAddresses = getContractAddresses(Number(selectedChain?.chainId) || 1);
   const routerAddress = contractAddresses.router;
 
-  // AIDEV-NOTE: Fetch pool data from database for token validation
+  //  Fetch pool data from database for token validation
   const fromTokenData: TokenData | undefined = token ? {
     _id: `token-${token.address}`,
     address: token.address,
@@ -223,7 +223,7 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
     enabled: action === 'remove' && !!collection && (!!token || actualLiquidityType === 'eth-nft'),
   });
 
-  // AIDEV-NOTE: Use exact LP amount as entered by user - no magic number adjustments
+  //  Use exact LP amount as entered by user - no magic number adjustments
   const adjustedLiquidityAmount = useMemo(() => {
     // For remove liquidity, use the exact amount the user entered
     return liquidityAmountInWei;
@@ -604,7 +604,7 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
             throw new Error('Token amount required for token-NFT liquidity');
           }
 
-          // AIDEV-NOTE: Calculate minimum amounts with slippage protection
+          //  Calculate minimum amounts with slippage protection
           const amountAMin = amountInWei * BigInt(10000 - slippageTolerance) / BigInt(10000);
 
           executeLiquidity({
@@ -630,11 +630,11 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
             throw new Error('ETH amount required for ETH-NFT liquidity');
           }
 
-          // AIDEV-NOTE: Calculate minimum ETH amount with slippage protection
+          //  Calculate minimum ETH amount with slippage protection
           // For new pools, be more tolerant with slippage to avoid INSUFFICIENT_B_AMOUNT
           let amountETHMin = amountInWei * BigInt(10000 - slippageTolerance) / BigInt(10000);
           
-          // AIDEV-NOTE: Temporary fix for new pools - use 0 minimum to avoid liquidity issues
+          //  Temporary fix for new pools - use 0 minimum to avoid liquidity issues
           // This happens when pool has very low or no existing liquidity
           if (!liquidityQuote?.expectedLiquidity || liquidityQuote.expectedLiquidity === BigInt(0)) {
             amountETHMin = BigInt(1); // Use 1 wei instead of 0 for safety
@@ -665,7 +665,7 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
             throw new Error('Token required for token-NFT liquidity removal');
           }
 
-          // AIDEV-NOTE: Use hardcoded 0 for amountAMin like the old AMM to avoid arithmetic underflow
+          //  Use hardcoded 0 for amountAMin like the old AMM to avoid arithmetic underflow
           // This removes slippage protection but ensures transaction success
           const amountAMin = BigInt(0);
 

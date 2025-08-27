@@ -1,9 +1,9 @@
-// AIDEV-NOTE: Hook React para testar e usar dados do subgraph
+//  Hook React para testar e usar dados do subgraph
 import { useChainContext } from '@/contexts/ChainContext';
 import { subgraphService, SubgraphService } from '@/services/SubgraphService';
 import { useQuery } from '@tanstack/react-query';
 
-// AIDEV-NOTE: Hook para buscar todos os pools do subgraph
+//  Hook para buscar todos os pools do subgraph
 export const useSubgraphAllPairs = (enabled: boolean = true) => {
   const { selectedChainId } = useChainContext();
   
@@ -22,7 +22,7 @@ export const useSubgraphAllPairs = (enabled: boolean = true) => {
   });
 };
 
-// AIDEV-NOTE: Hook para dados estáticos (combinados)
+//  Hook para dados estáticos (combinados)
 export const useSubgraphStaticData = () => {
   const { selectedChainId } = useChainContext();
 
@@ -53,7 +53,7 @@ export const useSubgraphStaticData = () => {
   };
 };
 
-// AIDEV-NOTE: Hook para estatísticas em tempo real
+//  Hook para estatísticas em tempo real
 export const useSubgraphRealtimeStats = (enabled: boolean = true) => {
   const { selectedChainId } = useChainContext();
   
@@ -64,7 +64,7 @@ export const useSubgraphRealtimeStats = (enabled: boolean = true) => {
         throw new Error(`Chain ${selectedChainId} not supported by subgraph`);
       }
       
-      // AIDEV-NOTE: Only get pairs for now, global stats removed
+      //  Only get pairs for now, global stats removed
       const allPairs = await subgraphService.getAllPairs(Number(selectedChainId), { first: 10, skip: 0 });
 
       return {

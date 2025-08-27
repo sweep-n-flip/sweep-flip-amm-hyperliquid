@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Comprehensive balance validation for swap operations
+//  Comprehensive balance validation for swap operations
 import { useMemo } from 'react';
 import { type Address, erc20Abi, erc721Abi, formatUnits, parseUnits } from 'viem';
 import { useAccount, useReadContract, useReadContracts } from 'wagmi';

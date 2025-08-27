@@ -174,7 +174,7 @@ export const NftSelectionModal = ({
                         alt={nft.name || `NFT #${nft.id}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          // AIDEV-NOTE: Fallback to placeholder if image fails to load
+                          //  Fallback to placeholder if image fails to load
                           const target = e.target as HTMLImageElement;
                           target.src = '/placeholder-nft.svg';
                         }}

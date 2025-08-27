@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Context for transaction settings to ensure global reactivity
+//  Context for transaction settings to ensure global reactivity
 'use client';
 
 import { useTransactionSettings } from '@/hooks/useTransactionSettings';

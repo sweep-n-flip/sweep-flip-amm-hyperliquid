@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Domain-specific errors
+//  Domain-specific errors
 import { type Address } from 'viem';
 
 export abstract class RouterError extends Error {

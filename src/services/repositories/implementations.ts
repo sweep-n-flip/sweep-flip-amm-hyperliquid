@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Concrete repository implementations
+//  Concrete repository implementations
 import { erc20Abi } from '@/abi/erc20';
 import { factoryAbi } from '@/abi/factory';
 import { routerAbi } from '@/abi/router';
@@ -238,7 +238,7 @@ export class CachedPoolRepository implements PoolRepository {
   }
 
   async getPoolFee(): Promise<number> {
-    // AIDEV-NOTE: Most pools have 0.3% fee (3000 basis points)
+    //  Most pools have 0.3% fee (3000 basis points)
     return 3000;
   }
 

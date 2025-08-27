@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Service layer with dependency injection
+//  Service layer with dependency injection
 import { RouterConfigService } from '../config/RouterConfigService';
 import {
   type SwapParameters,
@@ -21,7 +21,7 @@ export class RouterService {
 
   async getSwapQuote(params: SwapParameters): Promise<SwapQuote> {
     try {
-      // AIDEV-NOTE: Validate chain support
+      //  Validate chain support
       if (!this.config.isSupportedChain(params.fromToken.length > 0 ? 1 : 1)) {
         throw new Error('Unsupported chain');
       }
@@ -36,7 +36,7 @@ export class RouterService {
   }
 
   async getMultiHopQuote(params: SwapParameters): Promise<SwapQuote> {
-    // AIDEV-NOTE: Specific method for multi-hop quotes
+    //  Specific method for multi-hop quotes
     const multiHopParams = {
       ...params,
       forceMultiHop: true,
@@ -55,7 +55,7 @@ export class RouterService {
   }
 }
 
-// AIDEV-NOTE: Factory function for dependency injection
+//  Factory function for dependency injection
 export function createRouterService(
   chainId: number, 
   chainData: unknown, 
@@ -77,7 +77,7 @@ export function createRouterService(
   return new RouterService(swapQuoteUseCase, config);
 }
 
-// AIDEV-NOTE: Wagmi contract client adapter
+//  Wagmi contract client adapter
 export class WagmiContractClient implements ContractClient {
   constructor(private readonly wagmiReadContract: unknown) {}
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { type TokenData } from './useTokensFromDatabase'
 
-// AIDEV-NOTE: Enhanced pool structure with comprehensive token data
+//  Enhanced pool structure with comprehensive token data
 export interface PoolData {
   _id: string
   poolId: string
@@ -160,7 +160,7 @@ export function usePoolByTokens(
             isErc20: true,
             isCollection: false,
           },
-          // AIDEV-NOTE: Enhanced token references for easier access
+          //  Enhanced token references for easier access
           erc20Token: {
             address: erc20Token.address,
             symbol: erc20Token.symbol,

@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook to fetch NFTs from a pool/collection using Reservoir API
+//  Hook to fetch NFTs from a pool/collection using Reservoir API
 import { useChainContext } from '@/contexts/ChainContext';
 import { ReservoirService, type CollectionTokenData } from '@/services/ReservoirService';
 import { useCallback, useEffect, useMemo, useState } from 'react';

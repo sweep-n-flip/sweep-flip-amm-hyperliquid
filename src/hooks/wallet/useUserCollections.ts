@@ -1,4 +1,4 @@
-// AIDEV-NOTE: Hook to fetch all NFT collections owned by user using Reservoir API
+//  Hook to fetch all NFT collections owned by user using Reservoir API
 import { useChainContext } from '@/contexts/ChainContext';
 import { type TokenData } from '@/hooks/api/useTokensFromDatabase';
 import { ReservoirService } from '@/services/ReservoirService';
