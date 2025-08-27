@@ -6,6 +6,7 @@ export { NATIVE_COLLECTION_PAIRS_QUERY } from './NativeCollectionPairsQuery';
 export { PAIR_DAILY_VOLUME_QUERY } from './PairDailyVolumeQuery';
 export { PAIR_MONTHLY_TOTAL_VOLUME_QUERY } from './PairMonthlyVolumeQuery';
 export { PAIR_REALTIME_DATA_QUERY } from './PairRealtimeDataQuery';
+export { POOL_BY_ID_QUERY } from './PoolByIdQuery';
 
 //  TypeScript interfaces for query responses
 export interface SubgraphToken {

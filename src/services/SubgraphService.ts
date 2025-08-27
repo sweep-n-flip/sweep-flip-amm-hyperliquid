@@ -8,6 +8,7 @@ import { NATIVE_COLLECTION_PAIRS_QUERY } from './graphql/queries/NativeCollectio
 import { PAIR_DAILY_VOLUME_QUERY } from './graphql/queries/PairDailyVolumeQuery';
 import { PAIR_MONTHLY_TOTAL_VOLUME_QUERY } from './graphql/queries/PairMonthlyVolumeQuery';
 import { PAIR_REALTIME_DATA_QUERY } from './graphql/queries/PairRealtimeDataQuery';
+import { POOL_BY_ID_QUERY } from './graphql/queries/PoolByIdQuery';
 
 //  Chain IDs that match the backend configuration
 export enum ChainId {
@@ -42,6 +43,9 @@ export interface Token {
     id: string;
     name: string;
     symbol: string;
+    wrapper?: {
+      id: string;
+    };
   };
 }
 
@@ -54,6 +58,10 @@ export interface Pair {
   reserve0: string;
   reserve1: string;
   totalSupply?: string;
+}
+
+export interface PoolByIdResponse {
+  pairs: Pair[];
 }
 
 export interface PairDay {
@@ -172,6 +180,19 @@ export class SubgraphService {
       { pairId: poolId }
     );
     return response.pair || null;
+  }
+
+  //  Get pool data by pool ID (LP token address)
+  async getPoolById(chainId: ChainId, poolId: string): Promise<Pair | null> {
+    const client = this.getClient(chainId);
+    
+    const response: PoolByIdResponse = await client.request(
+      POOL_BY_ID_QUERY,
+      { poolId: poolId.toLowerCase() } // Ensure lowercase for consistency
+    );
+    
+    // Return the first (and should be only) pair or null if not found
+    return response.pairs?.[0] || null;
   }
 
   //  Check if subgraph is available for a chain

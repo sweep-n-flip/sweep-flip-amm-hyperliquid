@@ -48,6 +48,31 @@ interface UseLiquidityFlowParams {
     expectedETHAmount?: string | bigint;
     expectedLiquidity?: string | bigint;
   } | null;
+  
+  // Optional pool data (when provided, skips database lookup)
+  poolData?: {
+    id: string;
+    address: string;
+    token0: {
+      id: string;
+      symbol: string;
+      decimals: string;
+    };
+    token1: {
+      id: string;
+      symbol: string;
+      decimals: string;
+    };
+    reserve0: string;
+    reserve1: string;
+    totalSupply: string;
+    collection?: {
+      id: string;
+      name: string;
+      symbol: string;
+    };
+    tokenIds?: string[];
+  } | null;
 }
 
 export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
@@ -56,7 +81,7 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
   const { slippageTolerance, transactionDeadline } = useTransactionSettingsContext();
 
   // Extract params for easier access
-  const { action, liquidityType, token, collection, tokenAmount, ethAmount, tokenIds, liquidityAmount, liquidityQuote } = params;
+  const { action, liquidityType, token, collection, tokenAmount, ethAmount, tokenIds, liquidityAmount, liquidityQuote, poolData } = params;
 
   // Get userAddress from account
   const userAddress = userAccount;
@@ -119,8 +144,11 @@ export const useLiquidityFlow = (params: UseLiquidityFlowParams) => {
     Number(selectedChain?.chainId) || 1
   );
 
-  // Use appropriate result based on action
-  const poolResult = action === 'remove' ? poolByCollectionResult : poolByTokensResult;
+  // Use appropriate result based on action, or provided poolData
+  const poolResult = poolData ? 
+    { pool: poolData, loading: false, error: null } :
+    (action === 'remove' ? poolByCollectionResult : poolByTokensResult);
+    
   const pool = poolResult.pool;
   const isPoolLoading = poolResult.loading;
   const poolError = poolResult.error;

@@ -4,8 +4,8 @@ import { factoryAbi } from "@/abi/factory";
 import { routerAbi } from "@/abi/router";
 import { useChainContext } from "@/contexts/ChainContext";
 import { usePairs } from "@/hooks/api/usePairs";
-import { usePoolByTokens } from "@/hooks/api/usePoolByTokens";
 import { type TokenData } from "@/hooks/api/useTokensFromDatabase";
+import { usePoolById } from "@/hooks/subgraph/usePoolById";
 import { useTokenPriceInUSD } from "@/hooks/pricing/useTokenPriceInUSD";
 import { useLiquidityFlow } from "@/hooks/useLiquidityFlow";
 import { useTokenBalance } from "@/hooks/wallet";
@@ -443,15 +443,103 @@ export const LiquidityContent = (): JSX.Element | null => {
     return null; // Don't render on server
   }
 
-  // Get pool data from database
-  const { pool, loading: poolLoading } = usePoolByTokens(
-    selectedToken,
-    selectedCollection,
-    Number(selectedChainId)
-  );
-
   // Get token balances
   const tokenBalance = useTokenBalance(selectedToken, undefined);
+
+  // Check user's LP Token balance for the selected collection (needed for pool lookup)
+  const userLpTokenBalance = useLpTokenBalance({
+    tokenB: selectedCollection ? {
+      address: (selectedCollection.collection?.id || selectedCollection.address) as Address, // Use wrapper address for getPair
+      symbol: selectedCollection.symbol,
+      decimals: 0, // NFT collections don't have decimals
+      isErc20: false,
+      isCollection: true,
+      collection: {
+        id: selectedCollection.collection?.id || selectedCollection.address,
+        address: (selectedCollection.collection?.address || selectedCollection.address) as string, // Original NFT contract address
+      },
+    } : null,
+    enabled: !!selectedCollection, // Only run when collection is selected
+  });
+
+  // AIDEV-NOTE: Get pool data directly from subgraph using LP Token address (pool ID)
+  // This bypasses database dependency and gets real-time pool data for Remove Liquidity
+  // LP Token address = Pool ID in the subgraph, so we can fetch pool data directly
+  const { pool: subgraphPool, loading: poolLoading } = usePoolById({
+    poolId: userLpTokenBalance.pairAddress, // LP Token address IS the pool ID
+    enabled: !!userLpTokenBalance.pairAddress,
+  });
+
+  // Log LP token balance status for debugging
+
+  // Transform subgraph pool data to match the format expected by the rest of the component
+  // AIDEV-NOTE: This is the key transformation - we get pool data directly from subgraph
+  // using the LP Token address as the pool ID, bypassing any database dependencies
+  const pool = useMemo(() => {
+    if (!subgraphPool) {
+      return null;
+    }
+    
+    // Calculate NFT listings (count of NFTs in pool)
+    const nftListings = subgraphPool.token0.tokenIds?.length || subgraphPool.token1.tokenIds?.length || 0;
+    
+    // Determine which token is the NFT collection and which is ERC20
+    const isToken0Collection = subgraphPool.discrete0 && subgraphPool.token0.tokenIds && subgraphPool.token0.tokenIds.length > 0;
+    const isToken1Collection = subgraphPool.discrete1 && subgraphPool.token1.tokenIds && subgraphPool.token1.tokenIds.length > 0;
+    
+    // Calculate NFT price (ERC20 reserve / NFT count)
+    let nftPrice = 0;
+    if (isToken0Collection && parseFloat(subgraphPool.reserve1) > 0) {
+      // Token0 is NFT collection, Token1 is ERC20
+      nftPrice = parseFloat(subgraphPool.reserve1) / Math.max(1, nftListings);
+    } else if (isToken1Collection && parseFloat(subgraphPool.reserve0) > 0) {
+      // Token1 is NFT collection, Token0 is ERC20  
+      nftPrice = parseFloat(subgraphPool.reserve0) / Math.max(1, nftListings);
+    }
+    
+    const transformedPool = {
+      token0: {
+        address: subgraphPool.token0.id,
+        symbol: subgraphPool.token0.symbol,
+        name: subgraphPool.token0.name,
+      },
+      token1: {
+        address: subgraphPool.token1.id,
+        symbol: subgraphPool.token1.symbol,
+        name: subgraphPool.token1.name,
+      },
+      poolStats: {
+        nftListings,
+        nftPrice,
+        reserve0: parseFloat(subgraphPool.reserve0),
+        reserve1: parseFloat(subgraphPool.reserve1),
+        offers: 0, // Not available in subgraph data, set default
+      },
+    };
+    
+    return transformedPool;
+  }, [subgraphPool]);
+
+  // Get NFT token IDs from the subgraph pool data - this is critical for Remove Liquidity
+  const poolNftTokenIds = useMemo(() => {
+    if (!subgraphPool) {
+      return [];
+    }
+
+    // Return token IDs from whichever token is the NFT collection
+    let tokenIds: string[] = [];
+    let collectionInfo = '';
+    
+    if (subgraphPool.discrete0 && subgraphPool.token0.tokenIds && subgraphPool.token0.tokenIds.length > 0) {
+      tokenIds = subgraphPool.token0.tokenIds;
+      collectionInfo = `Token0 (${subgraphPool.token0.symbol})`;
+    } else if (subgraphPool.discrete1 && subgraphPool.token1.tokenIds && subgraphPool.token1.tokenIds.length > 0) {
+      tokenIds = subgraphPool.token1.tokenIds;
+      collectionInfo = `Token1 (${subgraphPool.token1.symbol})`;
+    }
+    
+    return tokenIds;
+  }, [subgraphPool]);
 
   // Check if we're on Hyperliquid chain
   const isHyperliquidChain = useMemo(() => 
@@ -476,15 +564,15 @@ export const LiquidityContent = (): JSX.Element | null => {
     chainId: Number(selectedChainId),
   });
 
-  // Fetch pool NFTs for the selected collection
+  // Fetch pool NFTs for the selected collection using subgraph data
   const poolNfts = usePoolNfts({
     collectionAddress: mounted && typeof window !== 'undefined' && selectedCollection?.isCollection 
       ? (selectedCollection.address as `0x${string}`) 
       : null,
-    tokenIds: mounted && typeof window !== 'undefined' && selectedCollection?.tokenIds 
-      ? selectedCollection.tokenIds 
+    tokenIds: mounted && typeof window !== 'undefined' && poolNftTokenIds.length > 0
+      ? poolNftTokenIds
       : [],
-    enabled: mounted && typeof window !== 'undefined' && !!selectedCollection?.isCollection && !!selectedCollection?.tokenIds?.length,
+    enabled: mounted && typeof window !== 'undefined' && !!selectedCollection?.isCollection && poolNftTokenIds.length > 0,
   });
 
   // Create unified user NFT data combining both hooks
@@ -508,6 +596,21 @@ export const LiquidityContent = (): JSX.Element | null => {
 
   // Memoize user NFT count using unified data
   const userNftCount = useMemo(() => unifiedUserNfts.tokenIds.length, [unifiedUserNfts.tokenIds]);
+
+  // AIDEV-NOTE: Final validation log for Remove Liquidity functionality
+  useEffect(() => {
+    if (liquidityAction === 'remove') {
+      const isRemoveReady = !!(
+        userLpTokenBalance.pairExists &&
+        userLpTokenBalance.pairAddress &&
+        subgraphPool &&
+        pool &&
+        poolNftTokenIds.length > 0 &&
+        parseFloat(userLpTokenBalance.balanceFormatted || '0') > 0
+      );
+
+    }
+  }, [liquidityAction, userLpTokenBalance, subgraphPool, pool, poolNftTokenIds, userLpTokenBalance.balanceFormatted]);
   // Use liquidity flow hook for managing operations
   const liquidityFlow = useLiquidityFlow({
     action: liquidityAction,
@@ -532,22 +635,8 @@ export const LiquidityContent = (): JSX.Element | null => {
       expectedETHAmount: BigInt(0),
       expectedLiquidity: BigInt(0),
     },
-  });
-
-  // Check user's LP Token balance for the selected collection
-  const userLpTokenBalance = useLpTokenBalance({
-    tokenB: selectedCollection ? {
-      address: (selectedCollection.collection?.id || selectedCollection.address) as Address, // Use wrapper address for getPair
-      symbol: selectedCollection.symbol,
-      decimals: 0, // NFT collections don't have decimals
-      isErc20: false,
-      isCollection: true,
-      collection: {
-        id: selectedCollection.collection?.id || selectedCollection.address,
-        address: (selectedCollection.collection?.address || selectedCollection.address) as string, // Original NFT contract address
-      },
-    } : null,
-    enabled: !!selectedCollection, // Only run when collection is selected
+    // Pass the transformed pool data from subgraph
+    poolData: pool || undefined,
   });
 
   // Handle action/type changes
@@ -583,8 +672,8 @@ export const LiquidityContent = (): JSX.Element | null => {
     if ((action === 'create' || action === 'add') && unifiedUserNfts.tokenIds.length > 0) {
       const tokenIds = unifiedUserNfts.tokenIds.slice(0, 1);
       setSelectedTokenIds(tokenIds);
-    } else if (action === 'remove' && selectedCollection?.tokenIds) {
-      const tokenIds = selectedCollection.tokenIds.slice(0, 1);
+    } else if (action === 'remove' && poolNftTokenIds.length > 0) {
+      const tokenIds = poolNftTokenIds.slice(0, 1);
       setSelectedTokenIds(tokenIds);
     }
   };
@@ -695,9 +784,9 @@ export const LiquidityContent = (): JSX.Element | null => {
       if (pool && pool.poolStats) {
         return Math.max(1, pool.poolStats.nftListings);
       }
-      return Math.max(1, selectedCollection.tokenIds?.length || 1);
+      return Math.max(1, poolNftTokenIds.length || 1);
     }
-  }, [liquidityAction, selectedCollection?.address, userNftCount, pool?.poolStats?.nftListings]);
+  }, [liquidityAction, selectedCollection?.address, userNftCount, pool?.poolStats?.nftListings, poolNftTokenIds.length]);
 
   const getMaxAmount = useCallback((token?: typeof selectedCollection) => {
     // Use memoized maxAmount by default, allow override for specific token
@@ -747,11 +836,11 @@ export const LiquidityContent = (): JSX.Element | null => {
     if ((liquidityAction === 'create' || liquidityAction === 'add') && unifiedUserNfts.tokenIds.length > 0) {
       const tokenIds = unifiedUserNfts.tokenIds.slice(0, clampedValue);
       setSelectedTokenIds(tokenIds);
-    } else if (liquidityAction === 'remove' && selectedCollection?.tokenIds) {
-      const tokenIds = selectedCollection.tokenIds.slice(0, clampedValue);
+    } else if (liquidityAction === 'remove' && poolNftTokenIds.length > 0) {
+      const tokenIds = poolNftTokenIds.slice(0, clampedValue);
       setSelectedTokenIds(tokenIds);
     }
-  }, [maxAmount, liquidityAction, unifiedUserNfts.tokenIds, selectedCollection?.tokenIds]);
+  }, [maxAmount, liquidityAction, unifiedUserNfts.tokenIds, poolNftTokenIds]);
 
   // Get collection info for display
   const getCollectionInfo = () => {
@@ -767,7 +856,7 @@ export const LiquidityContent = (): JSX.Element | null => {
       listings = pool.poolStats.nftListings.toString();
       offers = pool.poolStats.offers.toString();
     } else {
-      listings = selectedCollection.tokenIds?.length.toString() || "0";
+      listings = poolNftTokenIds.length.toString();
     }
     
     return {
@@ -957,9 +1046,9 @@ export const LiquidityContent = (): JSX.Element | null => {
       tokenIds = unifiedUserNfts.tokenIds;
       maxNfts = unifiedUserNfts.tokenIds.length;
     } else {
-      // When removing liquidity, use pool NFTs
-      tokenIds = token.tokenIds || [];
-      maxNfts = getMaxAmount(token);
+      // When removing liquidity, use pool NFTs from subgraph
+      tokenIds = poolNftTokenIds;
+      maxNfts = poolNftTokenIds.length;
     }
     
     // Get price per NFT from pool data (for create mode, we don't have pool data yet, so price will be 0)
