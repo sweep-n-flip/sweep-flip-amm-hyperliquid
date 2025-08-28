@@ -836,7 +836,7 @@ export const AmmSwapContent = (): JSX.Element => {
               value: Math.max(0, nftPoolInfo.data.nftListings - 1).toString()
             },
             { 
-              label: "NFT Offers", 
+              label: `${fromToken?.symbol} Offers`, 
               value: nftPoolInfo.data.offers.toString()
             },
           ]}

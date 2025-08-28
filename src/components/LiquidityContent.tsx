@@ -226,7 +226,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     }
   }, [liquidityAction, collectionAddress, defaultSelectedCollection, mounted]);
 
-  // AIDEV-NOTE: Auto-select first tokens when they are loaded for Add/Remove liquidity
+  //  Auto-select first tokens when they are loaded for Add/Remove liquidity
   useEffect(() => {
     if (!mounted || tokensLoading) return;
     
@@ -244,7 +244,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     }
   }, [mounted, tokensLoading, liquidityAction, tokenAddress, collectionAddress, erc20Tokens, nftTokens]);
 
-  // AIDEV-NOTE: Sync collectionAddress when selectedCollection changes automatically
+  //  Sync collectionAddress when selectedCollection changes automatically
   useEffect(() => {
     if (!mounted || tokensLoading) return;
     
@@ -461,8 +461,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     } : null,
     enabled: !!selectedCollection, // Only run when collection is selected
   });
-
-  // AIDEV-NOTE: Get pool data directly from subgraph using LP Token address (pool ID)
+  // Get pool data directly from subgraph using LP Token address (pool ID)
   // This bypasses database dependency and gets real-time pool data for Remove Liquidity
   // LP Token address = Pool ID in the subgraph, so we can fetch pool data directly
   const { pool: subgraphPool, loading: poolLoading } = usePoolById({
@@ -473,7 +472,7 @@ export const LiquidityContent = (): JSX.Element | null => {
   // Log LP token balance status for debugging
 
   // Transform subgraph pool data to match the format expected by the rest of the component
-  // AIDEV-NOTE: This is the key transformation - we get pool data directly from subgraph
+  //  This is the key transformation - we get pool data directly from subgraph
   // using the LP Token address as the pool ID, bypassing any database dependencies
   const pool = useMemo(() => {
     if (!subgraphPool) {
@@ -597,7 +596,7 @@ export const LiquidityContent = (): JSX.Element | null => {
   // Memoize user NFT count using unified data
   const userNftCount = useMemo(() => unifiedUserNfts.tokenIds.length, [unifiedUserNfts.tokenIds]);
 
-  // AIDEV-NOTE: Final validation log for Remove Liquidity functionality
+  //  Final validation log for Remove Liquidity functionality
   useEffect(() => {
     if (liquidityAction === 'remove') {
       const isRemoveReady = !!(
@@ -638,6 +637,18 @@ export const LiquidityContent = (): JSX.Element | null => {
     // Pass the transformed pool data from subgraph
     poolData: pool || undefined,
   });
+
+  // Automatically select the first NFT when user NFTs are loaded
+  useEffect(() => {
+    if (
+      (liquidityAction === 'create' || liquidityAction === 'add') &&
+      unifiedUserNfts.tokenIds.length > 0 &&
+      selectedTokenIds.length === 0 // Only run if no NFTs are selected yet
+    ) {
+      setSelectedTokenIds(unifiedUserNfts.tokenIds.slice(0, 1));
+      setSliderValue(1);
+    }
+  }, [liquidityAction, unifiedUserNfts.tokenIds, selectedTokenIds.length]);
 
   // Handle action/type changes
   const handleActionChange = (action: 'create' | 'add' | 'remove') => {
@@ -696,37 +707,7 @@ export const LiquidityContent = (): JSX.Element | null => {
     setLiquidityAmount(value);
   };
 
-  // Handle MAX button clicks
-  const handleMaxTokenAmount = () => {
-    if (selectedToken && (liquidityAction === 'add' || liquidityAction === 'create')) {
-      const balance = getUserBalance(selectedToken);
-      const numericBalance = balance.replace(/[^0-9.]/g, '');
-      const cleanBalance = parseFloat(numericBalance);
-      if (!isNaN(cleanBalance)) {
-        setTokenAmount(cleanBalance.toString());
-      }
-    }
-  };
-
-  const handleMaxEthAmount = () => {
-    if (liquidityAction === 'add' || liquidityAction === 'create') {
-      // Get ETH/WETH balance from wallet
-      const wethBalance = tokenBalance.userBalance || "0";
-      const numericBalance = wethBalance.replace(/[^0-9.]/g, '');
-      const cleanBalance = parseFloat(numericBalance);
-      if (!isNaN(cleanBalance)) {
-        setEthAmount(cleanBalance.toString());
-      }
-    }
-  };
-
-  const handleMaxLiquidityAmount = () => {
-    if (liquidityAction === 'remove') {
-      // Use real LP token balance from liquidityFlow
-      const lpBalance = liquidityFlow.lpTokenBalance.balanceFormatted;
-      setLiquidityAmount(lpBalance);
-    }
-  };
+  
 
   // Get user balance for tokens
   const getUserBalance = (token: typeof selectedToken) => {
@@ -841,6 +822,21 @@ export const LiquidityContent = (): JSX.Element | null => {
       setSelectedTokenIds(tokenIds);
     }
   }, [maxAmount, liquidityAction, unifiedUserNfts.tokenIds, poolNftTokenIds]);
+
+  //Automatically calculate token amount based on NFT selection and pool price
+  useEffect(() => {
+    if (liquidityAction === 'add' && pool?.poolStats?.nftPrice && selectedTokenIds.length > 0) {
+      const requiredTokenAmount = selectedTokenIds.length * pool.poolStats.nftPrice;
+      
+      if (liquidityType === 'eth-nft') {
+        setEthAmount(requiredTokenAmount.toString());
+        setTokenAmount(''); // Clear other amount
+      } else {
+        setTokenAmount(requiredTokenAmount.toString());
+        setEthAmount(''); // Clear other amount
+      }
+    }
+  }, [selectedTokenIds, pool?.poolStats?.nftPrice, liquidityAction, liquidityType]);
 
   // Get collection info for display
   const getCollectionInfo = () => {
@@ -1251,13 +1247,7 @@ export const LiquidityContent = (): JSX.Element | null => {
                 setEthAmount('');
               }
             }}
-            onMaxClick={() => {
-              if (selectedToken?.symbol === 'ETH' || selectedToken?.symbol === 'WETH' || selectedToken?.symbol === 'HYPE') {
-                handleMaxEthAmount();
-              } else {
-                handleMaxTokenAmount();
-              }
-            }}
+            
             placeholder="0.0"
             disabled={false}
           />
@@ -1309,15 +1299,9 @@ export const LiquidityContent = (): JSX.Element | null => {
                 setEthAmount('');
               }
             }}
-            onMaxClick={() => {
-              if (selectedToken?.symbol === 'ETH' || selectedToken?.symbol === 'WETH' || selectedToken?.symbol === 'HYPE') {
-                handleMaxEthAmount();
-              } else {
-                handleMaxTokenAmount();
-              }
-            }}
+            
             placeholder="0.0"
-            disabled={false}
+            disabled={true}
           />
 
           {/* NFT Collection Input for Add */}
@@ -1350,7 +1334,7 @@ export const LiquidityContent = (): JSX.Element | null => {
             selectedToken={undefined}
             onTokenSelect={() => {}} // LP token is fixed
             onAmountChange={handleLiquidityAmountChange}
-            onMaxClick={handleMaxLiquidityAmount}
+            
             placeholder="0.0"
             disabled={false}
           />

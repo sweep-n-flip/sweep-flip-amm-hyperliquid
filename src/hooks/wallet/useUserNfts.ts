@@ -48,7 +48,7 @@ export const useUserNfts = ({
 
   const fetchUserNfts = useCallback(async () => {
     if (!userAddress || !collectionAddress || !enabled) {
-      setNfts([]);
+      // setNfts([]); // Do not clear NFTs here to prevent flickering
       return;
     }
 

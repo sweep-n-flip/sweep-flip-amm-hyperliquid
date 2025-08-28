@@ -83,8 +83,8 @@ export const useHyperliquidUserNfts = ({
   // Process results and create NFT data
   useEffect(() => {
     if (!hyperliquidCollection || !tokensOfOwnerResult) {
-      setNfts([]);
-      setTokenIds([]);
+      // setNfts([]);
+      // setTokenIds([]);
       return;
     }
 
