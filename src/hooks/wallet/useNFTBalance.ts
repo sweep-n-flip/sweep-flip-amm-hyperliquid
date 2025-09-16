@@ -11,7 +11,7 @@ interface UseNFTBalanceResult {
 export function useNFTBalance(
   collectionAddress: string | undefined
 ): UseNFTBalanceResult {
-  const { address: userAddress } = useAccount()
+  const { address: userAddress } = useAccount();
 
   // Use useReadContract for NFT balance
   const {
@@ -26,17 +26,26 @@ export function useNFTBalance(
     query: {
       enabled: !!userAddress && !!collectionAddress,
     },
-  })
+  });
 
   return useMemo(() => {
+    // Return loading state if no user address or collection address
+    if (!userAddress || !collectionAddress) {
+      return {
+        balance: '0',
+        loading: false,
+        error: null,
+      };
+    }
+
     // For NFT collections, balance is just the count
-    const rawBalance = nftBalanceData as bigint | undefined
-    const formattedBalance = rawBalance ? rawBalance.toString() : '0'
+    const rawBalance = nftBalanceData as bigint | undefined;
+    const formattedBalance = rawBalance ? rawBalance.toString() : '0';
 
     return {
       balance: formattedBalance,
       loading: isLoading,
       error: error,
-    }
-  }, [nftBalanceData, isLoading, error])
+    };
+  }, [nftBalanceData, isLoading, error, userAddress, collectionAddress]);
 }

@@ -61,8 +61,8 @@ export const useNftPoolInfo = ({ poolId, enabled = true }: UseNftPoolInfoProps) 
         // NFT listings = number of NFTs in pool (reserve of NFT token)
         const nftListings = Math.floor(nftReserve);
 
-        // Offers = we can approximate based on ERC20 reserve divided by NFT price
-        const offers = nftPrice > 0 ? Math.floor(erc20Reserve / nftPrice) : 0;
+        // Offers = quantidade de tokens ERC20 que tem na pool
+        const offers = Math.floor(erc20Reserve);
 
         // Total supply from pair data
         const supply = parseFloat(totalSupply || '0');

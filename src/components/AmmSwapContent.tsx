@@ -701,11 +701,7 @@ export const AmmSwapContent = (): JSX.Element => {
         <NftCollectionInput
           amount={fromAmountFormatted}
           collection={fromToken?.collection?.symbol || fromToken?.symbol || 'Unknown'}
-          balance={
-            swapDirection === 'nft-to-erc20' && unifiedUserNfts.loading 
-              ? 'Loading...'
-              : getUserBalance(fromToken)
-          }
+          balance="0" // Will be overridden by useNFTBalance hook inside component
           iconSrc={fromToken?.logo || '/placeholder-nft.svg'}
           selectedToken={fromToken}
           onTokenSelect={handleFromTokenSelect}
@@ -749,7 +745,7 @@ export const AmmSwapContent = (): JSX.Element => {
         <NftCollectionInput
           amount={toAmountFormatted}
           collection={toToken?.collection?.symbol || toToken?.symbol || 'Unknown'}
-          balance={getPoolBalance(toToken)}
+          balance="0" // Will be overridden by useNFTBalance hook inside component
           iconSrc={toToken?.logo || '/placeholder-nft.svg'}
           selectedToken={toToken}
           onTokenSelect={handleToTokenSelect}
@@ -837,7 +833,7 @@ export const AmmSwapContent = (): JSX.Element => {
             },
             { 
               label: `${fromToken?.symbol} Offers`, 
-              value: nftPoolInfo.data.offers.toString()
+              value: `${nftPoolInfo.data.offers}`
             },
           ]}
           primaryImageSrc={toToken.logo || '/placeholder-nft.svg'}

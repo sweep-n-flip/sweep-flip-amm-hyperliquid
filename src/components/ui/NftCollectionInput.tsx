@@ -1,4 +1,5 @@
 import { type TokenData } from "@/hooks/api/useTokensFromDatabase";
+import { useNFTBalance } from "@/hooks/wallet/useNFTBalance";
 import { ChevronDownIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./button";
@@ -30,7 +31,7 @@ interface NftCollectionInputProps {
 export function NftCollectionInput({
   amount,
   collection,
-  balance,
+  balance, // Keep as fallback
   iconSrc,
   onChooseNfts,
   className = "",
@@ -46,11 +47,21 @@ export function NftCollectionInput({
   hasMoreReservoirCollections = false,
   loadingMoreReservoirCollections = false,
 }: NftCollectionInputProps): JSX.Element {
+  // Get user's actual NFT balance for the selected collection
+  const { balance: userNftBalance, loading: balanceLoading } = useNFTBalance(
+    selectedToken?.isCollection ? selectedToken.address : undefined
+  );
+
   const handleTokenSelect = (token: TokenData) => {
     if (onTokenSelect) {
       onTokenSelect(token);
     }
   };
+
+  // Use user NFT balance if available, otherwise fall back to provided balance
+  const displayBalance = selectedToken?.isCollection 
+    ? (balanceLoading ? 'Loading...' : userNftBalance)
+    : balance;
 
   return (
     <div className={`flex flex-col items-start gap-3 p-3 w-full bg-[#f5f5f5] rounded-xl ${className}`}>
@@ -131,7 +142,7 @@ export function NftCollectionInput({
         </div>
         <div className="flex justify-end w-full">
           <div className="text-xs text-gray-500">
-            Balance: {balance}
+            Balance: {displayBalance}
           </div>
         </div>
       </div>
