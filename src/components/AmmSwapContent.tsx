@@ -54,7 +54,7 @@ export const AmmSwapContent = (): JSX.Element => {
   // Helper function to check if token is native ETH
   const isNativeToken = (token: TokenData | undefined) => {
     if (!token) return false;
-    return token.symbol === 'ETH' && token.isErc20;
+    return token.address === '0x0000000000000000000000000000000000000000' && token.isErc20;
   };
 
   // Filter tokens by type
